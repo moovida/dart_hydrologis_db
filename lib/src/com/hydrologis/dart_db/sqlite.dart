@@ -3,18 +3,28 @@ part of dart_hydrologis_db;
 /// The Sqlite database used for project and datasets as mbtiles.
 class SqliteDb {
   Database _db;
-  final String _dbPath;
+  String _dbPath;
   bool _isClosed = false;
 
   SqliteDb(this._dbPath);
+
+  SqliteDb.memory() {
+    _dbPath = null;
+  }
 
   /// Open the database or create a new one.
   ///
   /// If supplied the [dbCreateFunction] is used.
   void open({Function dbCreateFunction}) {
-    var dbFile = File(_dbPath);
-    bool existsAlready = dbFile.existsSync();
-    _db = Database.openFile(dbFile);
+    bool existsAlready;
+    if (_dbPath == null) {
+      _db = Database.memory();
+      existsAlready = false;
+    } else {
+      var dbFile = File(_dbPath);
+      existsAlready = dbFile.existsSync();
+      _db = Database.openFile(dbFile);
+    }
     if (!existsAlready && dbCreateFunction != null) {
       dbCreateFunction(_db);
     }
@@ -171,5 +181,18 @@ class SqliteDb {
       columnsList.add([colName, colType, isPk]);
     });
     return columnsList;
+  }
+
+  /// Get the primary key from a non spatial db.
+  String getPrimaryKey(String tableName) {
+    String sql = "PRAGMA table_info(" + tableName + ")";
+    var res = select(sql);
+    for (var map in res) {
+      var pk = map["pk"];
+      if (pk == 1) {
+        return map["name"];
+      }
+    }
+    return null;
   }
 }

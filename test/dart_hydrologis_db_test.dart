@@ -1,13 +1,5 @@
-import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('A group of tests', () {
-
-    setUp(() {
-    });
-
-    test('First Test', () {
-    });
-  });
+  test('test', () {});
 }
