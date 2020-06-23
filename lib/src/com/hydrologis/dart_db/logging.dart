@@ -3,17 +3,17 @@ part of dart_hydrologis_db;
 /// A very simple Logger singleton class without external logger dependencies.
 ///
 /// Logs to console and a database on the device.
-class Logger {
-  static final Logger _instance = Logger._internal();
+class SLogger {
+  static final SLogger _instance = SLogger._internal();
 
   LogDb _logDb;
   String _folder;
 
   bool doConsoleLogging = true;
 
-  factory Logger() => _instance;
+  factory SLogger() => _instance;
 
-  Logger._internal();
+  SLogger._internal();
 
   bool init(String folder) {
     _folder = folder;
@@ -176,12 +176,12 @@ class LogDb {
 
   bool init(String folder) {
     try {
-      Logger().i("Init LogDb with folder: $folder and app name: $DB_NAME");
+      SLogger().i("Init LogDb with folder: $folder and app name: $DB_NAME");
       _dbPath = joinPaths(folder, DB_NAME);
       _db = SqliteDb(_dbPath);
       _db.open(dbCreateFunction: createLogDatabase);
     } catch (e, s) {
-      Logger().e("Error initializing LogDb", s);
+      SLogger().e("Error initializing LogDb", s);
       return false;
     }
     return true;

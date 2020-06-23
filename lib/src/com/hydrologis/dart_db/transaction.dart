@@ -38,16 +38,18 @@ class Transaction {
   /// If the transaction is not open, the method also opens it.
   /// In case of exception a rollback is performed.
   /// If the function finishes properly, the transaction is closed.
-  void runInTransaction(Function function) {
+  dynamic runInTransaction(Function function) {
     if (!_transactionOpen) {
       openTransaction();
     }
     try {
-      function();
+      dynamic result = function();
       closeTransaction();
+      return result;
     } catch (e, s) {
-      Logger().e("Error during transaction.", s);
+      SLogger().e("Error during transaction.", s);
       rollback();
     }
+    return null;
   }
 }

@@ -26,7 +26,8 @@ class SqliteDb {
       _db = Database.openFile(dbFile);
     }
     if (!existsAlready && dbCreateFunction != null) {
-      dbCreateFunction(_db);
+      // db is open already, we can use the wrapper for the create function.
+      dbCreateFunction(this);
     }
   }
 
@@ -130,8 +131,8 @@ class SqliteDb {
     return execute(sql, args);
   }
 
-  void transaction(Function transactionOperations) {
-    Transaction(this).runInTransaction(transactionOperations);
+  dynamic transaction(Function transactionOperations) {
+    return Transaction(this).runInTransaction(transactionOperations);
   }
 
   /// Get the list of table names, if necessary [doOrder].
