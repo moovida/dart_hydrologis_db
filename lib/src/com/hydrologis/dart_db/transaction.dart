@@ -43,7 +43,7 @@ class Transaction {
       openTransaction();
     }
     try {
-      dynamic result = function();
+      dynamic result = function(_db);
       closeTransaction();
       return result;
     } catch (e, s) {

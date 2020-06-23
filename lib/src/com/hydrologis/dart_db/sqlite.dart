@@ -122,7 +122,7 @@ class SqliteDb {
       if (keysVal == null) {
         keysVal = "$key=?";
       } else {
-        keysVal = ",$key=?";
+        keysVal += ",$key=?";
       }
       args.add(value);
     });
