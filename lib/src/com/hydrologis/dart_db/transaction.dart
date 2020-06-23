@@ -6,7 +6,7 @@ class Transaction {
   static final String END = "END;";
   static final String ROLLBACK = "ROLLBACK;";
 
-  final Database _db;
+  final SqliteDb _db;
   bool _transactionOpen = false;
 
   Transaction(this._db);
@@ -45,7 +45,8 @@ class Transaction {
     try {
       function();
       closeTransaction();
-    } catch (e) {
+    } catch (e, s) {
+      Logger().e("Error during transaction.", s);
       rollback();
     }
   }

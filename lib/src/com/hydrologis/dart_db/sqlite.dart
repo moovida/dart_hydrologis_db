@@ -55,7 +55,7 @@ class SqliteDb {
   ///
   /// Optionally a custom [whereString] piece can be passed in. This needs to start with the word where.
   List<T> getQueryObjectsList<T>(QueryObjectBuilder<T> queryObj,
-      {whereString: ""}) {
+      {whereString = ""}) {
     String querySql = "${queryObj.querySql()} $whereString";
 
     List<T> items = [];
@@ -131,8 +131,7 @@ class SqliteDb {
   }
 
   void transaction(Function transactionOperations) {
-    Transaction t = Transaction(_db);
-    t.runInTransaction(transactionOperations);
+    Transaction(this).runInTransaction(transactionOperations);
   }
 
   /// Get the list of table names, if necessary [doOrder].
