@@ -246,6 +246,18 @@ void main() {
 
     db.close();
   });
+
+  test('test transaction with class', () {
+    var db = SqliteDb.memory();
+    db.open();
+    Transaction(db).runInTransaction((_db) {
+      _db.execute(createTable1);
+      _db.execute(createTable2);
+    });
+    expect(db.hasTable("table1"), true);
+    
+    db.close();
+  });
 }
 
 void createDbFunction(SqliteDb _db) {
