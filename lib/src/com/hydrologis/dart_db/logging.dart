@@ -203,14 +203,14 @@ class LogDb {
   String get path => _dbPath;
 
   void createLogDatabase(var db) {
-    db.execute(CREATE_STATEMENT);
+    db?.execute(CREATE_STATEMENT);
   }
 
   void put(Level level, String message) {
     var item = GpLogItem()
       ..level = level.toString()
       ..message = message;
-    _db.insertMap(TABLE_NAME, item.toMap());
+    _db?.insertMap(TABLE_NAME, item.toMap());
   }
 }
 
