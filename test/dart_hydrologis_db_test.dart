@@ -173,7 +173,7 @@ void main() {
     db.close();
   });
 
-  test('test transaction block', () {
+  test('test transaction block - error printed is expected', () {
     var db = SqliteDb.memory();
     db.open();
 
