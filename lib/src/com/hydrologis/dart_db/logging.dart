@@ -15,14 +15,16 @@ class SLogger {
 
   SLogger._internal();
 
+  /// Initialize database logging. Without this call, everything goes just to standard out.
   bool init(String folder) {
     _folder = folder;
-    i("Initializing GpLogger with folder: $_folder");
+    i("Initializing SLogger with folder: $_folder");
 
     _logDb = LogDb();
     return _logDb.init(_folder);
   }
 
+  /// Delete all the log db content.
   void clearLog() {
     _logDb._db.execute("delete from ${LogDb.TABLE_NAME};");
   }
@@ -79,6 +81,7 @@ class SLogger {
     }
   }
 
+  /// Get the current list of log items.
   List<GpLogItem> getLogItems({int limit}) {
     return _logDb.getLogItems(limit: limit);
   }
