@@ -77,6 +77,9 @@ class SLogger {
     if (doConsoleLogging) {
       print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       print("e: ${message.toString()}");
+      if (stackTrace != null) {
+        print(stackTrace);
+      }
       print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
     }
   }
@@ -213,4 +216,3 @@ class LogDb {
     _db?.insertMap(TABLE_NAME, item.toMap());
   }
 }
-
