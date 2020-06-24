@@ -2,12 +2,12 @@ import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
 
 const createTable1 = '''
-            CREATE TABLE table1 (  
-              id INTEGER PRIMARY KEY AUTOINCREMENT, 
-              name TEXT,  
-              temperature REAL
-            );
-            ''';
+CREATE TABLE table1 (  
+  id INTEGER PRIMARY KEY AUTOINCREMENT, 
+  name TEXT,  
+  temperature REAL
+);
+''';
 
 const insertTable1 = [
   "INSERT INTO table1 VALUES(1, 'Tscherms', 36.0);", //
@@ -16,12 +16,12 @@ const insertTable1 = [
 ];
 
 const createTable2 = '''
-            CREATE TABLE table2 (  
-              id INTEGER PRIMARY KEY AUTOINCREMENT, 
-              table1id INTEGER,  
-              FOREIGN KEY (table1id) REFERENCES table1 (id)
-            );
-            ''';
+  CREATE TABLE table2 (  
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    table1id INTEGER,  
+    FOREIGN KEY (table1id) REFERENCES table1 (id)
+  );
+  ''';
 const insertTable2 = [
   "INSERT INTO table2 VALUES(1, 1);", //
   "INSERT INTO table2 VALUES(2, 2);", //
@@ -255,7 +255,7 @@ void main() {
       _db.execute(createTable2);
     });
     expect(db.hasTable("table1"), true);
-    
+
     db.close();
   });
 }
