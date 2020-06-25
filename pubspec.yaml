@@ -1,7 +1,6 @@
 name: dart_hydrologis_db
 description: Dart moor based db utilities.
 version: 0.2.0
-homepage: https://www.hydrologis.com
 repository: https://github.com/moovida/dart_hydrologis_db
 issue_tracker: https://github.com/moovida/dart_hydrologis_db/issues
 
