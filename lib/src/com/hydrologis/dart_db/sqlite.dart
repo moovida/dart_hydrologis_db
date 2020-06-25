@@ -70,13 +70,21 @@ class SqliteDb {
 
   /// Execute a insert, update or delete using [sqlToExecute] in normal
   /// or prepared mode using [arguments].
-  int execute(String sqlToExecute, [List<dynamic> arguments]) {
+  ///
+  /// This returns the number of affected rows. Only if [getLastInsertId]
+  /// is set to true, the id of the last inserted row is returned.
+  int execute(String sqlToExecute,
+      {List<dynamic> arguments, bool getLastInsertId = false}) {
     PreparedStatement stmt;
     try {
       stmt = _db.prepare(sqlToExecute);
       stmt.execute(arguments);
 
-      return _db.getUpdatedRows();
+      if (getLastInsertId) {
+        return _db.getLastInsertId();
+      } else {
+        return _db.getUpdatedRows();
+      }
     } finally {
       stmt?.close();
     }
@@ -94,7 +102,9 @@ class SqliteDb {
     }
   }
 
-  /// Insert a new record using a map.
+  /// Insert a new record using a map [values] into a given [table].
+  ///
+  /// This returns the id of the inserted row.
   int insertMap(String table, Map<String, dynamic> values) {
     List<dynamic> args = [];
     var keys;
@@ -111,10 +121,12 @@ class SqliteDb {
     });
 
     var sql = "insert into $table ( $keys ) values ( $questions );";
-    return execute(sql, args);
+    return execute(sql, arguments: args, getLastInsertId: true);
   }
 
   /// Update a new record using a map and a where condition.
+  ///
+  /// This returns the number of rows affected.
   int updateMap(String table, Map<String, dynamic> values, String where) {
     List<dynamic> args = [];
     var keysVal;
@@ -128,9 +140,12 @@ class SqliteDb {
     });
 
     var sql = "update $table set $keysVal where $where;";
-    return execute(sql, args);
+    return execute(sql, arguments: args);
   }
 
+  /// Run a set of operations inside a transaction.
+  ///
+  /// This returns whatever the function's return value is.
   dynamic transaction(Function transactionOperations) {
     return Transaction(this).runInTransaction(transactionOperations);
   }
