@@ -1,6 +1,6 @@
 ## 0.2.0
 
-- Use devel version of moor to allow android rtree to be used.
+- Use moor 0.7.0 to allow android rtree to be used.
 
 ## 0.1.0
 
