@@ -1,3 +1,7 @@
+## 0.2.1
+
+- add of mbtiles db type.
+
 ## 0.2.0
 
 - Use moor 0.7.0 to allow android rtree to be used.
