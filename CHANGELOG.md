@@ -1,3 +1,7 @@
+## 0.2.1+1
+
+- added datatypes utility
+
 ## 0.2.1
 
 - add of mbtiles db type.

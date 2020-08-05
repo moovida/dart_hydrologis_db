@@ -69,7 +69,7 @@ class SLogger {
     }
   }
 
-  void e(dynamic message, StackTrace stackTrace) {
+  void e(dynamic message, [StackTrace stackTrace]) {
     _logDb?.put(Level.error, message);
     if (stackTrace != null) {
       _logDb?.put(Level.error, Trace.format(stackTrace));

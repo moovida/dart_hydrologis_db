@@ -258,6 +258,24 @@ void main() {
 
     db.close();
   });
+
+  test('test datatypes', () {
+    SqliteTypes.DOUBLE.value.forEach((v) {
+      expect(SqliteTypes.isDouble(v), true);
+    });
+    SqliteTypes.DOUBLE_SW.value.forEach((v) {
+      expect(SqliteTypes.isDouble(v), true);
+    });
+    SqliteTypes.INTEGER.value.forEach((v) {
+      expect(SqliteTypes.isInteger(v), true);
+    });
+    SqliteTypes.TEXT.value.forEach((v) {
+      expect(SqliteTypes.isString(v), true);
+    });
+    SqliteTypes.TEXT_SW.value.forEach((v) {
+      expect(SqliteTypes.isString(v), true);
+    });
+  });
 }
 
 void createDbFunction(SqliteDb _db) {
