@@ -39,12 +39,14 @@ class SqliteTypes {
     "CLOB",
   ]);
   static const TEXT_SW = SqliteTypes._([
+    "TEXT",
     "CHARACTER",
     "VARCHAR",
     "VARYING CHARACTER",
     "NCHAR",
     "NATIVE CHARACTER",
     "NVARCHAR",
+    "CLOB",
   ]);
 
   // static get values => [APPLE, BANANA];

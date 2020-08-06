@@ -275,6 +275,7 @@ void main() {
     SqliteTypes.TEXT_SW.value.forEach((v) {
       expect(SqliteTypes.isString(v), true);
     });
+    expect(SqliteTypes.isString("TEXT(48)"), true);
   });
 }
 
