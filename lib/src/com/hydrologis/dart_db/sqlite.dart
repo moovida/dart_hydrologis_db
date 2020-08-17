@@ -233,20 +233,19 @@ class SqliteDb {
   /// enabled, the function may only be invoked form top-level SQL, and cannot
   /// be used in VIEWs or TRIGGERs nor in schema structures (such as CHECK,
   /// DEFAULT, etc.).
-  // TODO uncomment when sqlite3 works
-  // void createFunction({
-  //   String functionName,
-  //   ScalarFunction function,
-  //   int argumentCount,
-  //   bool deterministic = false,
-  //   bool directOnly = true,
-  // }) {
-  //   _db.createFunction(
-  //     functionName: functionName,
-  //     argumentCount: AllowedArgumentCount(argumentCount),
-  //     deterministic: deterministic,
-  //     directOnly: directOnly,
-  //     function: function,
-  //   );
-  // }
+  void createFunction({
+    String functionName,
+    ScalarFunction function,
+    int argumentCount,
+    bool deterministic = false,
+    bool directOnly = true,
+  }) {
+    _db.createFunction(
+      functionName: functionName,
+      argumentCount: AllowedArgumentCount(argumentCount),
+      deterministic: deterministic,
+      directOnly: directOnly,
+      function: function,
+    );
+  }
 }
