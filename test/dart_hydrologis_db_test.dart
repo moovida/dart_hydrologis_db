@@ -308,7 +308,28 @@ void main() {
   //   // var version = db.select('SELECT dart_version()');
   //   // db.close();
   // });
+
+  /// Old moor version test, not working on macos
+  // test('test custom function creation', () {
+  //   var db = SqliteDb.memory();
+  //   db.open();
+  //   var moorDb = db.getInternalDb();
+  //   moorDb.createFunction(
+  //       'dart_version', 0, Pointer.fromFunction(versionFunction),
+  //       isDeterministic: true, directOnly: false);
+
+  //   var version = db.select('SELECT dart_version()');
+  //   print(version.first);
+  //   db.close();
+  // });
 }
+
+/// Old moor version test, not working on macos
+// void versionFunction(Pointer<FunctionContext> ctx, int argCount,
+//     Pointer<Pointer<SqliteValue>> args) {
+//   String version = Platform.version;
+//   ctx.resultNum(10);
+// }
 
 void createDbFunction(SqliteDb _db) {
   _db.execute(createTable1);

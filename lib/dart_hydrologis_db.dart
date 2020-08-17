@@ -4,8 +4,8 @@ library dart_hydrologis_db;
 import 'dart:io';
 import 'dart:math';
 
-// import 'package:sqlite3/sqlite3.dart';
-import 'package:moor_ffi/database.dart';
+import 'package:sqlite3/sqlite3.dart';
+// import 'package:moor_ffi/database.dart';
 import 'package:path/path.dart';
 import 'package:stack_trace/stack_trace.dart';
 
