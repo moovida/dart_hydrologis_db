@@ -18,12 +18,12 @@ class SqliteDb {
   void open({Function dbCreateFunction}) {
     bool existsAlready;
     if (_dbPath == null) {
-      _db = Database.memory();
+      _db = sqlite3.openInMemory();
       existsAlready = false;
     } else {
       var dbFile = File(_dbPath);
       existsAlready = dbFile.existsSync();
-      _db = Database.openFile(dbFile);
+      _db = sqlite3.open(_dbPath);
     }
     if (!existsAlready && dbCreateFunction != null) {
       // db is open already, we can use the wrapper for the create function.
@@ -43,7 +43,7 @@ class SqliteDb {
   /// Close the database.
   void close() {
     _isClosed = true;
-    return _db?.close();
+    return _db?.dispose();
   }
 
   /// This should only be used when a custom function is necessary,
@@ -81,12 +81,12 @@ class SqliteDb {
       stmt.execute(arguments);
 
       if (getLastInsertId) {
-        return _db.getLastInsertId();
+        return _db.lastInsertRowId;
       } else {
         return _db.getUpdatedRows();
       }
     } finally {
-      stmt?.close();
+      stmt?.dispose();
     }
   }
 
@@ -95,10 +95,10 @@ class SqliteDb {
     PreparedStatement selectStmt;
     try {
       selectStmt = _db.prepare(sql);
-      final Result result = selectStmt.select(arguments);
+      final ResultSet result = selectStmt.select(arguments);
       return result;
     } finally {
-      selectStmt?.close();
+      selectStmt?.dispose();
     }
   }
 
