@@ -1,3 +1,7 @@
+## 0.3.0
+
+- remove deprecated moor_ffi and migrate to suggested sqlite3.
+
 ## 0.2.1+1
 
 - added datatypes utility

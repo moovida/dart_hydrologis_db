@@ -1,6 +1,6 @@
 name: dart_hydrologis_db
 description: Dart moor based db utilities.
-version: 0.2.1+2
+version: 0.3.0
 repository: https://github.com/moovida/dart_hydrologis_db
 issue_tracker: https://github.com/moovida/dart_hydrologis_db/issues
 
@@ -11,18 +11,10 @@ dependencies:
  path: ^1.7.0
 
  # MIT
-#  moor_ffi: ^0.7.0
  sqlite3: ^0.1.4
 
  # BSD
  stack_trace: ^1.9.3
-
-# dependency_overrides:
-#  moor_ffi: 
-#   git:
-#     url: https://github.com/moovida/moor.git
-#     ref: develop
-#     path: moor_ffi
 
 dev_dependencies:
   pedantic: ^1.9.0
