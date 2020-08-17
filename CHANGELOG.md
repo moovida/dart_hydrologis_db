@@ -1,6 +1,7 @@
 ## 0.3.0
 
 - remove deprecated moor_ffi and migrate to suggested sqlite3.
+- bring function creation to module.
 
 ## 0.2.1+1
 
