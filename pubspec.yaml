@@ -11,7 +11,10 @@ dependencies:
  path: ^1.7.0
 
  # MIT
- sqlite3: ^0.1.4
+#  sqlite3: ^0.1.4
+ moor: 3.2.0
+
+ moor_ffi: 0.7.0
 
  # BSD
  stack_trace: ^1.9.3

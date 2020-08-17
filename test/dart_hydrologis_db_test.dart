@@ -277,6 +277,37 @@ void main() {
     });
     expect(SqliteTypes.isString("TEXT(48)"), true);
   });
+
+  // test('test custom function creation', () {
+  //   final db = sqlite3.openInMemory();
+  //   db.createFunction(
+  //     functionName: 'dart_version',
+  //     argumentCount: const AllowedArgumentCount(0),
+  //     function: (args) {
+  //       return Platform.version;
+  //     },
+  //     deterministic: true,
+  //     directOnly: false,
+  //   );
+  //   var version = db.select('SELECT dart_version()');
+  //   print(version.first);
+  //   db.dispose();
+
+  //   // var db = SqliteDb.memory();
+  //   // db.open();
+  //   //     var func = (args) {
+  //   //   return Platform.version;
+  //   // };
+  //   // db.createFunction(
+  //   //   functionName: 'dart_version',
+  //   //   argumentCount: 0,
+  //   //   function: func,
+  //   //   deterministic: true,
+  //   //   directOnly: false,
+  //   // );
+  //   // var version = db.select('SELECT dart_version()');
+  //   // db.close();
+  // });
 }
 
 void createDbFunction(SqliteDb _db) {
