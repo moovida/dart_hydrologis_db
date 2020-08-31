@@ -88,3 +88,24 @@ class SqliteTypes {
     return isDouble;
   }
 }
+
+class DbsUtilities {
+  /// Check the tablename and fix it if necessary.
+  ///
+  /// @param tableName the name to check.
+  /// @return the fixed name.
+  static String fixTableName(String tableName) {
+    if (tableName[0] == '\'') {
+      // already fixed
+      return tableName;
+    }
+    double num = double.tryParse(tableName.substring(0, 1));
+
+    if (num != null ||
+        tableName.contains("-") ||
+        tableName.contains(RegExp(r'\s+'))) {
+      return "'" + tableName + "'";
+    }
+    return tableName;
+  }
+}

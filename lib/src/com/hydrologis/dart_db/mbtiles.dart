@@ -285,7 +285,7 @@ class MBTilesDb {
 //
   void checkMetadata() {
     if (metadataMap == null) {
-      metadataMap = Map();
+      metadataMap = {};
 
       var res = database.select(SELECT_METADATA);
       res.forEach((row) {

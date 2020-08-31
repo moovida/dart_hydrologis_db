@@ -1,3 +1,7 @@
+## 0.3.1
+
+- add table name escaping utility
+
 ## 0.3.0
 
 - remove deprecated moor_ffi and migrate to suggested sqlite3.

@@ -2,7 +2,7 @@ import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
 
 const createTable1 = '''
-CREATE TABLE table1 (  
+CREATE TABLE 'table 1' (  
   id INTEGER PRIMARY KEY AUTOINCREMENT, 
   name TEXT,  
   temperature REAL
@@ -10,16 +10,16 @@ CREATE TABLE table1 (
 ''';
 
 const insertTable1 = [
-  "INSERT INTO table1 VALUES(1, 'Tscherms', 36.0);", //
-  "INSERT INTO table1 VALUES(2, 'Meran', 34.0);", //
-  "INSERT INTO table1 VALUES(3, 'Bozen', 42.0);", //
+  "INSERT INTO 'table 1' VALUES(1, 'Tscherms', 36.0);", //
+  "INSERT INTO 'table 1' VALUES(2, 'Meran', 34.0);", //
+  "INSERT INTO 'table 1' VALUES(3, 'Bozen', 42.0);", //
 ];
 
 const createTable2 = '''
   CREATE TABLE table2 (  
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     table1id INTEGER,  
-    FOREIGN KEY (table1id) REFERENCES table1 (id)
+    FOREIGN KEY (table1id) REFERENCES 'table 1' (id)
   );
   ''';
 const insertTable2 = [
@@ -46,7 +46,7 @@ class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
 
   @override
   String querySql() {
-    return "select id, name, temperature from table1 order by id;";
+    return "select id, name, temperature from 'table 1' order by id;";
   }
 
   @override
@@ -64,10 +64,10 @@ void main() {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
 
-    expect(true, db.hasTable("table1"));
+    expect(true, db.hasTable("table 1"));
     expect(true, db.hasTable("table2"));
 
-    var tableColumns = db.getTableColumns("table1");
+    var tableColumns = db.getTableColumns("table 1");
     expect(3, tableColumns.length);
     tableColumns = db.getTableColumns("table2");
     expect(2, tableColumns.length);
@@ -78,7 +78,7 @@ void main() {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
 
-    var select = db.select("select * from table1 order by id");
+    var select = db.select("select * from 'table 1' order by id");
     var row = select.first;
 
     expect(row['id'], 1);
@@ -91,7 +91,7 @@ void main() {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
 
-    var sql = "INSERT INTO table1 VALUES(4, 'Egna', 27.0);";
+    var sql = "INSERT INTO 'table 1' VALUES(4, 'Egna', 27.0);";
     db.execute(sql);
 
     var map = {
@@ -99,15 +99,15 @@ void main() {
       'name': 'Trento',
       'temperature': 18.0,
     };
-    db.insertMap("table1", map);
+    db.insertMap("table 1", map);
 
-    var select = db.select("select * from table1 where id=4");
+    var select = db.select("select * from 'table 1' where id=4");
     var row = select.first;
     expect(row['id'], 4);
     expect(row['name'], 'Egna');
     expect(row['temperature'], 27.0);
 
-    select = db.select("select * from table1 where id=5");
+    select = db.select("select * from 'table 1' where id=5");
     row = select.first;
     expect(row['id'], 5);
     expect(row['name'], 'Trento');
@@ -119,10 +119,10 @@ void main() {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
 
-    var sql = "UPDATE  table1 set name='Egna', temperature=27.0 where id=3;";
+    var sql = "UPDATE  'table 1' set name='Egna', temperature=27.0 where id=3;";
     db.execute(sql);
 
-    var select = db.select("select * from table1 where id=3");
+    var select = db.select("select * from 'table 1' where id=3");
     var row = select.first;
     expect(row['id'], 3);
     expect(row['name'], 'Egna');
@@ -132,9 +132,9 @@ void main() {
       'name': 'Trento',
       'temperature': 18.0,
     };
-    db.updateMap("table1", map, "id=3");
+    db.updateMap("table 1", map, "id=3");
 
-    select = db.select("select * from table1 where id=3");
+    select = db.select("select * from 'table 1' where id=3");
     row = select.first;
     expect(row['id'], 3);
     expect(row['name'], 'Trento');
@@ -147,7 +147,7 @@ void main() {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
 
-    var primaryKey = db.getPrimaryKey("table1");
+    var primaryKey = db.getPrimaryKey("table 1");
     expect('id', primaryKey);
 
     db.close();
@@ -168,7 +168,7 @@ void main() {
       });
     });
 
-    expect(db.hasTable("table1"), true);
+    expect(db.hasTable("table 1"), true);
 
     db.close();
   });
@@ -187,11 +187,11 @@ void main() {
         _db.execute(sql);
       });
 
-      var sql = "INSERT INTO table1 VALUES(1, 'Tscherms', 36.0);";
+      var sql = "INSERT INTO 'table 1' VALUES(1, 'Tscherms', 36.0);";
       _db.execute(sql);
     });
 
-    expect(db.hasTable("table1"), false);
+    expect(db.hasTable("table 1"), false);
 
     db.close();
   });
@@ -206,7 +206,7 @@ void main() {
     db.execute(createTable2);
     tx.closeTransaction();
 
-    expect(db.hasTable("table1"), true);
+    expect(db.hasTable("table 1"), true);
 
     db.close();
   });
@@ -221,7 +221,7 @@ void main() {
     db.execute(createTable2);
     tx.rollback();
 
-    expect(db.hasTable("table1"), false);
+    expect(db.hasTable("table 1"), false);
 
     db.close();
   });
@@ -254,7 +254,7 @@ void main() {
       _db.execute(createTable1);
       _db.execute(createTable2);
     });
-    expect(db.hasTable("table1"), true);
+    expect(db.hasTable("table 1"), true);
 
     db.close();
   });
@@ -276,6 +276,24 @@ void main() {
       expect(SqliteTypes.isString(v), true);
     });
     expect(SqliteTypes.isString("TEXT(48)"), true);
+  });
+
+  test('test tablename fix', () {
+    var tableName = "3numericStart";
+    var newTableName = DbsUtilities.fixTableName(tableName);
+    expect(newTableName, "'$tableName'");
+
+    tableName = "with spaces   and    tabs";
+    newTableName = DbsUtilities.fixTableName(tableName);
+    expect(newTableName, "'$tableName'");
+
+    tableName = "with-dash";
+    newTableName = DbsUtilities.fixTableName(tableName);
+    expect(newTableName, "'$tableName'");
+
+    tableName = "'already escaped'";
+    newTableName = DbsUtilities.fixTableName(tableName);
+    expect(newTableName, tableName);
   });
 
   // test('test custom function creation', () {
