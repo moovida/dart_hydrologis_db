@@ -7,7 +7,7 @@ var t3Name = SqlName("10table with,nasty");
 var col1Name = SqlName("10col with,nasty");
 
 var createTable1 = '''
-CREATE TABLE ${t1Name.quotedName} (  
+CREATE TABLE ${t1Name.fixedName} (  
   id INTEGER PRIMARY KEY AUTOINCREMENT, 
   name TEXT,  
   temperature REAL
@@ -15,34 +15,34 @@ CREATE TABLE ${t1Name.quotedName} (
 ''';
 
 var insertTable1 = [
-  "INSERT INTO ${t1Name.quotedName} VALUES(1, 'Tscherms', 36.0);", //
-  "INSERT INTO ${t1Name.quotedName} VALUES(2, 'Meran', 34.0);", //
-  "INSERT INTO ${t1Name.quotedName} VALUES(3, 'Bozen', 42.0);", //
+  "INSERT INTO ${t1Name.fixedName} VALUES(1, 'Tscherms', 36.0);", //
+  "INSERT INTO ${t1Name.fixedName} VALUES(2, 'Meran', 34.0);", //
+  "INSERT INTO ${t1Name.fixedName} VALUES(3, 'Bozen', 42.0);", //
 ];
 
 var createTable2 = '''
-  CREATE TABLE ${t2Name.quotedName} (  
+  CREATE TABLE ${t2Name.fixedName} (  
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     table1id INTEGER,  
-    FOREIGN KEY (table1id) REFERENCES ${t1Name.quotedName} (id)
+    FOREIGN KEY (table1id) REFERENCES ${t1Name.fixedName} (id)
   );
   ''';
 var insertTable2 = [
-  "INSERT INTO ${t2Name.quotedName} VALUES(1, 1);", //
-  "INSERT INTO ${t2Name.quotedName} VALUES(2, 2);", //
-  "INSERT INTO ${t2Name.quotedName} VALUES(3, 3);", //
+  "INSERT INTO ${t2Name.fixedName} VALUES(1, 1);", //
+  "INSERT INTO ${t2Name.fixedName} VALUES(2, 2);", //
+  "INSERT INTO ${t2Name.fixedName} VALUES(3, 3);", //
 ];
 
 var createTable3 = '''
-  CREATE TABLE ${t3Name.quotedName} (  
+  CREATE TABLE ${t3Name.fixedName} (  
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    ${col1Name.quotedName} INTEGER
+    ${col1Name.fixedName} INTEGER
   );
   ''';
 var insertTable3 = [
-  "INSERT INTO ${t3Name.quotedName} VALUES(1, 1);", //
-  "INSERT INTO ${t3Name.quotedName} VALUES(2, 2);", //
-  "INSERT INTO ${t3Name.quotedName} VALUES(3, 3);", //
+  "INSERT INTO ${t3Name.fixedName} VALUES(1, 1);", //
+  "INSERT INTO ${t3Name.fixedName} VALUES(2, 2);", //
+  "INSERT INTO ${t3Name.fixedName} VALUES(3, 3);", //
 ];
 
 class Table1Obj {
@@ -118,13 +118,13 @@ void main() {
     };
     db.insertMap(t1Name, map);
 
-    var select = db.select("select * from ${t1Name.quotedName} where id=4");
+    var select = db.select("select * from ${t1Name.fixedName} where id=4");
     var row = select.first;
     expect(row['id'], 4);
     expect(row['name'], 'Egna');
     expect(row['temperature'], 27.0);
 
-    select = db.select("select * from ${t1Name.quotedName} where id=5");
+    select = db.select("select * from ${t1Name.fixedName} where id=5");
     row = select.first;
     expect(row['id'], 5);
     expect(row['name'], 'Trento');
@@ -137,10 +137,10 @@ void main() {
     db.open(dbCreateFunction: createDbFunction);
 
     var sql =
-        "UPDATE  ${t1Name.quotedName} set name='Egna', temperature=27.0 where id=3;";
+        "UPDATE  ${t1Name.fixedName} set name='Egna', temperature=27.0 where id=3;";
     db.execute(sql);
 
-    var select = db.select("select * from ${t1Name.quotedName} where id=3");
+    var select = db.select("select * from ${t1Name.fixedName} where id=3");
     var row = select.first;
     expect(row['id'], 3);
     expect(row['name'], 'Egna');
@@ -152,7 +152,7 @@ void main() {
     };
     db.updateMap(t1Name, map, "id=3");
 
-    select = db.select("select * from ${t1Name.quotedName} where id=3");
+    select = db.select("select * from ${t1Name.fixedName} where id=3");
     row = select.first;
     expect(row['id'], 3);
     expect(row['name'], 'Trento');
@@ -171,17 +171,17 @@ void main() {
     expect(2, tableColumns.length);
 
     var select = db.select(
-        "select ${col1Name.bracketName} from ${t3Name.quotedName} where id=1");
+        "select ${col1Name.bracketName} from ${t3Name.fixedName} where id=1");
     var row = select.first;
     expect(row[col1Name.name], 1);
 
     var map = {
-      col1Name.quotedName: 1000,
+      col1Name.fixedName: 1000,
     };
     db.updateMap(t3Name, map, "id=1");
 
     select = db.select(
-        "select ${col1Name.bracketName} from ${t3Name.quotedName} where id=1");
+        "select ${col1Name.bracketName} from ${t3Name.fixedName} where id=1");
     row = select.first;
     expect(row[col1Name.name], 1000);
 
