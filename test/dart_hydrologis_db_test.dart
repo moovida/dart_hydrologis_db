@@ -1,31 +1,48 @@
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
 
-const createTable1 = '''
-CREATE TABLE 'table 1' (  
+var t1Name = SqlName("table 1");
+var t2Name = SqlName("table2");
+var t3Name = SqlName("10table with,nasty");
+var col1Name = SqlName("10col with,nasty");
+
+var createTable1 = '''
+CREATE TABLE ${t1Name.quotedName} (  
   id INTEGER PRIMARY KEY AUTOINCREMENT, 
   name TEXT,  
   temperature REAL
 );
 ''';
 
-const insertTable1 = [
-  "INSERT INTO 'table 1' VALUES(1, 'Tscherms', 36.0);", //
-  "INSERT INTO 'table 1' VALUES(2, 'Meran', 34.0);", //
-  "INSERT INTO 'table 1' VALUES(3, 'Bozen', 42.0);", //
+var insertTable1 = [
+  "INSERT INTO ${t1Name.quotedName} VALUES(1, 'Tscherms', 36.0);", //
+  "INSERT INTO ${t1Name.quotedName} VALUES(2, 'Meran', 34.0);", //
+  "INSERT INTO ${t1Name.quotedName} VALUES(3, 'Bozen', 42.0);", //
 ];
 
-const createTable2 = '''
-  CREATE TABLE table2 (  
+var createTable2 = '''
+  CREATE TABLE ${t2Name.quotedName} (  
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     table1id INTEGER,  
-    FOREIGN KEY (table1id) REFERENCES 'table 1' (id)
+    FOREIGN KEY (table1id) REFERENCES ${t1Name.quotedName} (id)
   );
   ''';
-const insertTable2 = [
-  "INSERT INTO table2 VALUES(1, 1);", //
-  "INSERT INTO table2 VALUES(2, 2);", //
-  "INSERT INTO table2 VALUES(3, 3);", //
+var insertTable2 = [
+  "INSERT INTO ${t2Name.quotedName} VALUES(1, 1);", //
+  "INSERT INTO ${t2Name.quotedName} VALUES(2, 2);", //
+  "INSERT INTO ${t2Name.quotedName} VALUES(3, 3);", //
+];
+
+var createTable3 = '''
+  CREATE TABLE ${t3Name.quotedName} (  
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    ${col1Name.quotedName} INTEGER
+  );
+  ''';
+var insertTable3 = [
+  "INSERT INTO ${t3Name.quotedName} VALUES(1, 1);", //
+  "INSERT INTO ${t3Name.quotedName} VALUES(2, 2);", //
+  "INSERT INTO ${t3Name.quotedName} VALUES(3, 3);", //
 ];
 
 class Table1Obj {
@@ -60,9 +77,6 @@ class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
 }
 
 void main() {
-  var t1Name = SqlName("table 1");
-  var t2Name = SqlName("table2");
-
   test('test creation', () {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
@@ -104,13 +118,13 @@ void main() {
     };
     db.insertMap(t1Name, map);
 
-    var select = db.select("select * from ${t1Name.fixedName} where id=4");
+    var select = db.select("select * from ${t1Name.quotedName} where id=4");
     var row = select.first;
     expect(row['id'], 4);
     expect(row['name'], 'Egna');
     expect(row['temperature'], 27.0);
 
-    select = db.select("select * from ${t1Name.fixedName} where id=5");
+    select = db.select("select * from ${t1Name.quotedName} where id=5");
     row = select.first;
     expect(row['id'], 5);
     expect(row['name'], 'Trento');
@@ -123,10 +137,10 @@ void main() {
     db.open(dbCreateFunction: createDbFunction);
 
     var sql =
-        "UPDATE  ${t1Name.fixedName} set name='Egna', temperature=27.0 where id=3;";
+        "UPDATE  ${t1Name.quotedName} set name='Egna', temperature=27.0 where id=3;";
     db.execute(sql);
 
-    var select = db.select("select * from ${t1Name.fixedName} where id=3");
+    var select = db.select("select * from ${t1Name.quotedName} where id=3");
     var row = select.first;
     expect(row['id'], 3);
     expect(row['name'], 'Egna');
@@ -138,11 +152,38 @@ void main() {
     };
     db.updateMap(t1Name, map, "id=3");
 
-    select = db.select("select * from ${t1Name.fixedName} where id=3");
+    select = db.select("select * from ${t1Name.quotedName} where id=3");
     row = select.first;
     expect(row['id'], 3);
     expect(row['name'], 'Trento');
     expect(row['temperature'], 18.0);
+
+    db.close();
+  });
+
+  test('test ugly names', () {
+    var db = SqliteDb.memory();
+    db.open(dbCreateFunction: createUglyDbFunction);
+
+    expect(true, db.hasTable(t3Name));
+
+    var tableColumns = db.getTableColumns(t3Name);
+    expect(2, tableColumns.length);
+
+    var select = db.select(
+        "select ${col1Name.bracketName} from ${t3Name.quotedName} where id=1");
+    var row = select.first;
+    expect(row[col1Name.name], 1);
+
+    var map = {
+      col1Name.quotedName: 1000,
+    };
+    db.updateMap(t3Name, map, "id=1");
+
+    select = db.select(
+        "select ${col1Name.bracketName} from ${t3Name.quotedName} where id=1");
+    row = select.first;
+    expect(row[col1Name.name], 1000);
 
     db.close();
   });
@@ -284,19 +325,19 @@ void main() {
 
   test('test tablename fix', () {
     var tableName = "3numericStart";
-    var newTableName = DbsUtilities.fixTableName(tableName);
+    var newTableName = DbsUtilities.fixWithQuotes(tableName);
     expect(newTableName, "'$tableName'");
 
     tableName = "with spaces   and    tabs";
-    newTableName = DbsUtilities.fixTableName(tableName);
+    newTableName = DbsUtilities.fixWithQuotes(tableName);
     expect(newTableName, "'$tableName'");
 
     tableName = "with-dash";
-    newTableName = DbsUtilities.fixTableName(tableName);
+    newTableName = DbsUtilities.fixWithQuotes(tableName);
     expect(newTableName, "'$tableName'");
 
     tableName = "'already escaped'";
-    newTableName = DbsUtilities.fixTableName(tableName);
+    newTableName = DbsUtilities.fixWithQuotes(tableName);
     expect(newTableName, tableName);
   });
 
@@ -360,6 +401,13 @@ void createDbFunction(SqliteDb _db) {
     _db.execute(sql);
   });
   insertTable2.forEach((sql) {
+    _db.execute(sql);
+  });
+}
+
+void createUglyDbFunction(SqliteDb _db) {
+  _db.execute(createTable3);
+  insertTable3.forEach((sql) {
     _db.execute(sql);
   });
 }

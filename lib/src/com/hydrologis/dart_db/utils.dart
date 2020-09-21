@@ -92,31 +92,54 @@ class SqliteTypes {
 class DbsUtilities {
   /// Check the tablename and fix it if necessary.
   ///
-  /// @param tableName the name to check.
+  /// @param name the name to check.
   /// @return the fixed name.
-  static String fixTableName(String tableName) {
-    if (tableName[0] == '\'') {
+  static String fixWithQuotes(String name) {
+    if (name[0] == '\'') {
       // already fixed
-      return tableName;
+      return name;
     }
-    double num = double.tryParse(tableName.substring(0, 1));
+    double num = double.tryParse(name.substring(0, 1));
 
     if (num != null ||
-        tableName.contains("-") ||
-        tableName.contains(",") ||
-        tableName.contains(RegExp(r'\s+'))) {
-      return "'" + tableName + "'";
+        name.contains("-") ||
+        name.contains(",") ||
+        name.contains(RegExp(r'\s+'))) {
+      return "'" + name + "'";
     }
-    return tableName;
+    return name;
+  }
+
+  /// Check the columnName and fix it if necessary.
+  ///
+  /// @param name the name to check.
+  /// @return the fixed name.
+  static String fixWithBrackets(String name) {
+    if (name[0] == '[') {
+      // already fixed
+      return name;
+    }
+    double num = double.tryParse(name.substring(0, 1));
+
+    if (num != null ||
+        name.contains("-") ||
+        name.contains(",") ||
+        name.contains(RegExp(r'\s+'))) {
+      return "[" + name + "]";
+    }
+    return name;
   }
 }
 
 /// A name for sql related strings (table names and column names ex.).
 ///
-/// This will contain the original name and the fixed one
+/// This will contain the original name,the fixed one and the one between square brackets.
 class SqlName {
   final String name;
-  final String fixedName;
+  final String quotedName;
+  final String bracketName;
 
-  SqlName(this.name) : fixedName = DbsUtilities.fixTableName(name);
+  SqlName(this.name)
+      : quotedName = DbsUtilities.fixWithQuotes(name),
+        bracketName = DbsUtilities.fixWithBrackets(name);
 }
