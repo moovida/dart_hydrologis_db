@@ -1,3 +1,7 @@
+## 0.4.0
+
+- ad SqlName utility class to make safe name usage easier. This breaks compatibility.
+
 ## 0.3.1
 
 - add table name escaping utility
