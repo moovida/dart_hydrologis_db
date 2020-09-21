@@ -136,10 +136,18 @@ class DbsUtilities {
 /// This will contain the original name,the fixed one and the one between square brackets.
 class SqlName {
   final String name;
-  final String quotedName;
+
+  /// The name fixed by quoting, if necessary.
+  ///
+  /// This might be needed for strange table names.
+  final String fixedName;
+
+  /// The name fixed by surrounding with square brackets, if necessary.
+  ///
+  /// This might be needed for example in select queries for strange column names.
   final String bracketName;
 
   SqlName(this.name)
-      : quotedName = DbsUtilities.fixWithQuotes(name),
+      : fixedName = DbsUtilities.fixWithQuotes(name),
         bracketName = DbsUtilities.fixWithBrackets(name);
 }

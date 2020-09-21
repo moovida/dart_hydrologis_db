@@ -127,8 +127,7 @@ class SqliteDb {
       args.add(value);
     });
 
-    var sql =
-        "insert into ${table.quotedName} ( $keys ) values ( $questions );";
+    var sql = "insert into ${table.fixedName} ( $keys ) values ( $questions );";
     return execute(sql, arguments: args, getLastInsertId: true);
   }
 
@@ -147,7 +146,7 @@ class SqliteDb {
       args.add(value);
     });
 
-    var sql = "update ${table.quotedName} set $keysVal where $where;";
+    var sql = "update ${table.fixedName} set $keysVal where $where;";
     return execute(sql, arguments: args);
   }
 
@@ -194,7 +193,7 @@ class SqliteDb {
 
   /// Get the [tableName] columns as array of name, type and isPrimaryKey.
   List<List<dynamic>> getTableColumns(SqlName tableName) {
-    String sql = "PRAGMA table_info(${tableName.quotedName})";
+    String sql = "PRAGMA table_info(${tableName.fixedName})";
     List<List<dynamic>> columnsList = [];
 
     var res = select(sql);
@@ -209,7 +208,7 @@ class SqliteDb {
 
   /// Get the primary key from a non spatial db.
   String getPrimaryKey(SqlName tableName) {
-    String sql = "PRAGMA table_info(${tableName.quotedName})";
+    String sql = "PRAGMA table_info(${tableName.fixedName})";
     var res = select(sql);
     for (var map in res) {
       var pk = map["pk"];
