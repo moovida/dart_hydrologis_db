@@ -60,16 +60,19 @@ class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
 }
 
 void main() {
+  var t1Name = SqlName("table 1");
+  var t2Name = SqlName("table2");
+
   test('test creation', () {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
 
-    expect(true, db.hasTable("table 1"));
-    expect(true, db.hasTable("table2"));
+    expect(true, db.hasTable(t1Name));
+    expect(true, db.hasTable(t2Name));
 
-    var tableColumns = db.getTableColumns("table 1");
+    var tableColumns = db.getTableColumns(t1Name);
     expect(3, tableColumns.length);
-    tableColumns = db.getTableColumns("table2");
+    tableColumns = db.getTableColumns(t2Name);
     expect(2, tableColumns.length);
 
     db.close();
@@ -99,15 +102,15 @@ void main() {
       'name': 'Trento',
       'temperature': 18.0,
     };
-    db.insertMap("table 1", map);
+    db.insertMap(t1Name, map);
 
-    var select = db.select("select * from 'table 1' where id=4");
+    var select = db.select("select * from ${t1Name.fixedName} where id=4");
     var row = select.first;
     expect(row['id'], 4);
     expect(row['name'], 'Egna');
     expect(row['temperature'], 27.0);
 
-    select = db.select("select * from 'table 1' where id=5");
+    select = db.select("select * from ${t1Name.fixedName} where id=5");
     row = select.first;
     expect(row['id'], 5);
     expect(row['name'], 'Trento');
@@ -119,10 +122,11 @@ void main() {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
 
-    var sql = "UPDATE  'table 1' set name='Egna', temperature=27.0 where id=3;";
+    var sql =
+        "UPDATE  ${t1Name.fixedName} set name='Egna', temperature=27.0 where id=3;";
     db.execute(sql);
 
-    var select = db.select("select * from 'table 1' where id=3");
+    var select = db.select("select * from ${t1Name.fixedName} where id=3");
     var row = select.first;
     expect(row['id'], 3);
     expect(row['name'], 'Egna');
@@ -132,9 +136,9 @@ void main() {
       'name': 'Trento',
       'temperature': 18.0,
     };
-    db.updateMap("table 1", map, "id=3");
+    db.updateMap(t1Name, map, "id=3");
 
-    select = db.select("select * from 'table 1' where id=3");
+    select = db.select("select * from ${t1Name.fixedName} where id=3");
     row = select.first;
     expect(row['id'], 3);
     expect(row['name'], 'Trento');
@@ -147,7 +151,7 @@ void main() {
     var db = SqliteDb.memory();
     db.open(dbCreateFunction: createDbFunction);
 
-    var primaryKey = db.getPrimaryKey("table 1");
+    var primaryKey = db.getPrimaryKey(t1Name);
     expect('id', primaryKey);
 
     db.close();
@@ -168,7 +172,7 @@ void main() {
       });
     });
 
-    expect(db.hasTable("table 1"), true);
+    expect(db.hasTable(t1Name), true);
 
     db.close();
   });
@@ -191,7 +195,7 @@ void main() {
       _db.execute(sql);
     });
 
-    expect(db.hasTable("table 1"), false);
+    expect(db.hasTable(t1Name), false);
 
     db.close();
   });
@@ -206,7 +210,7 @@ void main() {
     db.execute(createTable2);
     tx.closeTransaction();
 
-    expect(db.hasTable("table 1"), true);
+    expect(db.hasTable(t1Name), true);
 
     db.close();
   });
@@ -221,7 +225,7 @@ void main() {
     db.execute(createTable2);
     tx.rollback();
 
-    expect(db.hasTable("table 1"), false);
+    expect(db.hasTable(t1Name), false);
 
     db.close();
   });
@@ -254,7 +258,7 @@ void main() {
       _db.execute(createTable1);
       _db.execute(createTable2);
     });
-    expect(db.hasTable("table 1"), true);
+    expect(db.hasTable(t1Name), true);
 
     db.close();
   });

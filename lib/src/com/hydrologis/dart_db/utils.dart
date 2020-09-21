@@ -103,9 +103,20 @@ class DbsUtilities {
 
     if (num != null ||
         tableName.contains("-") ||
+        tableName.contains(",") ||
         tableName.contains(RegExp(r'\s+'))) {
       return "'" + tableName + "'";
     }
     return tableName;
   }
+}
+
+/// A name for sql related strings (table names and column names ex.).
+///
+/// This will contain the original name and the fixed one
+class SqlName {
+  final String name;
+  final String fixedName;
+
+  SqlName(this.name) : fixedName = DbsUtilities.fixTableName(name);
 }

@@ -112,7 +112,7 @@ class SqliteDb {
   /// Insert a new record using a map [values] into a given [table].
   ///
   /// This returns the id of the inserted row.
-  int insertMap(String table, Map<String, dynamic> values) {
+  int insertMap(SqlName table, Map<String, dynamic> values) {
     List<dynamic> args = [];
     var keys;
     var questions;
@@ -127,15 +127,14 @@ class SqliteDb {
       args.add(value);
     });
 
-    table = DbsUtilities.fixTableName(table);
-    var sql = "insert into $table ( $keys ) values ( $questions );";
+    var sql = "insert into ${table.fixedName} ( $keys ) values ( $questions );";
     return execute(sql, arguments: args, getLastInsertId: true);
   }
 
   /// Update a new record using a map and a where condition.
   ///
   /// This returns the number of rows affected.
-  int updateMap(String table, Map<String, dynamic> values, String where) {
+  int updateMap(SqlName table, Map<String, dynamic> values, String where) {
     List<dynamic> args = [];
     var keysVal;
     values.forEach((key, value) {
@@ -147,8 +146,7 @@ class SqliteDb {
       args.add(value);
     });
 
-    table = DbsUtilities.fixTableName(table);
-    var sql = "update $table set $keysVal where $where;";
+    var sql = "update ${table.fixedName} set $keysVal where $where;";
     return execute(sql, arguments: args);
   }
 
@@ -160,8 +158,8 @@ class SqliteDb {
   }
 
   /// Get the list of table names, if necessary [doOrder].
-  List<String> getTables({bool doOrder = false}) {
-    List<String> tableNames = [];
+  List<SqlName> getTables({bool doOrder = false}) {
+    List<SqlName> tableNames = [];
     String orderBy = " ORDER BY name";
     if (!doOrder) {
       orderBy = "";
@@ -172,30 +170,30 @@ class SqliteDb {
     var res = select(sql);
     res.forEach((row) {
       var name = row['name'];
-      tableNames.add(name);
+      tableNames.add(SqlName(name));
     });
     return tableNames;
   }
 
   /// Check is a given [tableName] exists.
-  bool hasTable(String tableName) {
-    String sql = "SELECT name FROM sqlite_master WHERE type='table'";
-    tableName = tableName.toLowerCase();
+  bool hasTable(SqlName tableName) {
+    String sql = """
+      SELECT count(name) FROM sqlite_master WHERE type='table' 
+      and lower(name)=lower(?)
+    """;
 
-    var res = select(sql);
-    for (var row in res) {
-      var name = row['name'];
-      if (name.toLowerCase() == tableName) {
-        return true;
-      }
+    var res = select(sql, [tableName.name]);
+    if (res.length == 1) {
+      var row = res.first;
+      var count = row.columnAt(0);
+      return count == 1;
     }
     return false;
   }
 
   /// Get the [tableName] columns as array of name, type and isPrimaryKey.
-  List<List<dynamic>> getTableColumns(String tableName) {
-    tableName = DbsUtilities.fixTableName(tableName);
-    String sql = "PRAGMA table_info(" + tableName + ")";
+  List<List<dynamic>> getTableColumns(SqlName tableName) {
+    String sql = "PRAGMA table_info(${tableName.fixedName})";
     List<List<dynamic>> columnsList = [];
 
     var res = select(sql);
@@ -209,9 +207,8 @@ class SqliteDb {
   }
 
   /// Get the primary key from a non spatial db.
-  String getPrimaryKey(String tableName) {
-    tableName = DbsUtilities.fixTableName(tableName);
-    String sql = "PRAGMA table_info(" + tableName + ")";
+  String getPrimaryKey(SqlName tableName) {
+    String sql = "PRAGMA table_info(${tableName.fixedName})";
     var res = select(sql);
     for (var map in res) {
       var pk = map["pk"];
