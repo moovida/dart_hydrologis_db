@@ -191,7 +191,11 @@ class SqliteDb {
     return false;
   }
 
-  /// Get the [tableName] columns as array of name, type and isPrimaryKey.
+  /// Get the [tableName] columns as array of:
+  ///   - name (string),
+  ///   - type (string),
+  ///   - isPrimaryKey (int, 1 for true)
+  ///   - notnull (int).
   List<List<dynamic>> getTableColumns(SqlName tableName) {
     String sql = "PRAGMA table_info(${tableName.fixedName})";
     List<List<dynamic>> columnsList = [];
@@ -201,7 +205,8 @@ class SqliteDb {
       String colName = row['name'];
       String colType = row['type'];
       int isPk = row['pk'];
-      columnsList.add([colName, colType, isPk]);
+      int notNull = row['notnull'];
+      columnsList.add([colName, colType, isPk, notNull]);
     });
     return columnsList;
   }
