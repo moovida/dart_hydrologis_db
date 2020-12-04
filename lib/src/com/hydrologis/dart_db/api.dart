@@ -53,6 +53,7 @@ class QueryResult {
       resultSet.forEach((row) {
         rowFunction(row);
       });
+      return;
     }
     throw StateError("No query result defined.");
   }
@@ -66,6 +67,7 @@ class QueryResult {
           return QueryResultRow.fromResultSetRow(map);
         }
       }
+      return null;
     }
     throw StateError("No query result defined.");
   }
