@@ -1,18 +1,20 @@
 part of dart_hydrologis_db;
 
 /// The Sqlite database used for project and datasets as mbtiles.
-class SqliteDb extends ADb {
+class PostgresDb {
   Database _db;
   String _dbPath;
   bool _isClosed = false;
 
-  SqliteDb(this._dbPath);
+  PostgresDb(this._dbPath);
 
-  SqliteDb.memory() {
+  PostgresDb.memory() {
     _dbPath = null;
   }
 
-  @override
+  /// Open the database or create a new one.
+  ///
+  /// If supplied the [dbCreateFunction] is used.
   void open({Function dbCreateFunction}) {
     bool existsAlready;
     if (_dbPath == null) {
@@ -34,13 +36,13 @@ class SqliteDb extends ADb {
   /// Get the database path.
   String get path => _dbPath;
 
-  @override
+  /// Checks if the database is open.
   bool isOpen() {
     if (_db == null) return false;
     return !_isClosed;
   }
 
-  @override
+  /// Close the database.
   void close() {
     _isClosed = true;
     return _db?.dispose();
@@ -53,7 +55,9 @@ class SqliteDb extends ADb {
     return _db;
   }
 
-  @override
+  /// Get a list of items defined by the [queryObj].
+  ///
+  /// Optionally a custom [whereString] piece can be passed in. This needs to start with the word where.
   List<T> getQueryObjectsList<T>(QueryObjectBuilder<T> queryObj,
       {whereString = ""}) {
     String querySql = "${queryObj.querySql()} $whereString";
@@ -67,7 +71,11 @@ class SqliteDb extends ADb {
     return items;
   }
 
-  @override
+  /// Execute a insert, update or delete using [sqlToExecute] in normal
+  /// or prepared mode using [arguments].
+  ///
+  /// This returns the number of affected rows. Only if [getLastInsertId]
+  /// is set to true, the id of the last inserted row is returned.
   int execute(String sqlToExecute,
       {List<dynamic> arguments, bool getLastInsertId = false}) {
     PreparedStatement stmt;
@@ -88,12 +96,13 @@ class SqliteDb extends ADb {
   }
 
   /// The standard query method.
-  QueryResult select(String sql, [List<dynamic> arguments]) {
+  Iterable<Row> select(String sql, [List<dynamic> arguments]) {
     PreparedStatement selectStmt;
     try {
       selectStmt = _db.prepare(sql);
       final ResultSet result = selectStmt.select(arguments);
-      return QueryResult.fromResultSet(result);
+      // final Result result = selectStmt.select(arguments);
+      return result;
     } finally {
       selectStmt?.dispose();
       // selectStmt?.close();
@@ -145,7 +154,8 @@ class SqliteDb extends ADb {
   ///
   /// This returns whatever the function's return value is.
   dynamic transaction(Function transactionOperations) {
-    return Transaction(this).runInTransaction(transactionOperations);
+    // TODO
+    // return Transaction(this).runInTransaction(transactionOperations);
   }
 
   /// Get the list of table names, if necessary [doOrder].
@@ -176,7 +186,7 @@ class SqliteDb extends ADb {
     var res = select(sql, [tableName.name]);
     if (res.length == 1) {
       var row = res.first;
-      var count = row.getAt(0);
+      var count = row.columnAt(0);
       return count == 1;
     }
     return false;
@@ -206,9 +216,11 @@ class SqliteDb extends ADb {
   String getPrimaryKey(SqlName tableName) {
     String sql = "PRAGMA table_info(${tableName.fixedName})";
     var res = select(sql);
-    var resultRow = res.find("pk", 1);
-    if (resultRow != null) {
-      return resultRow.get("name");
+    for (var map in res) {
+      var pk = map["pk"];
+      if (pk == 1) {
+        return map["name"];
+      }
     }
     return null;
   }

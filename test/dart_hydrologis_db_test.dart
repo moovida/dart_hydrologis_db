@@ -98,9 +98,9 @@ void main() {
     var select = db.select("select * from 'table 1' order by id");
     var row = select.first;
 
-    expect(row['id'], 1);
-    expect(row['name'], 'Tscherms');
-    expect(row['temperature'], 36.0);
+    expect(row.get('id'), 1);
+    expect(row.get('name'), 'Tscherms');
+    expect(row.get('temperature'), 36.0);
 
     db.close();
   });
@@ -120,15 +120,15 @@ void main() {
 
     var select = db.select("select * from ${t1Name.fixedName} where id=4");
     var row = select.first;
-    expect(row['id'], 4);
-    expect(row['name'], 'Egna');
-    expect(row['temperature'], 27.0);
+    expect(row.get('id'), 4);
+    expect(row.get('name'), 'Egna');
+    expect(row.get('temperature'), 27.0);
 
     select = db.select("select * from ${t1Name.fixedName} where id=5");
     row = select.first;
-    expect(row['id'], 5);
-    expect(row['name'], 'Trento');
-    expect(row['temperature'], 18.0);
+    expect(row.get('id'), 5);
+    expect(row.get('name'), 'Trento');
+    expect(row.get('temperature'), 18.0);
 
     db.close();
   });
@@ -142,9 +142,9 @@ void main() {
 
     var select = db.select("select * from ${t1Name.fixedName} where id=3");
     var row = select.first;
-    expect(row['id'], 3);
-    expect(row['name'], 'Egna');
-    expect(row['temperature'], 27.0);
+    expect(row.get('id'), 3);
+    expect(row.get('name'), 'Egna');
+    expect(row.get('temperature'), 27.0);
 
     var map = {
       'name': 'Trento',
@@ -154,9 +154,9 @@ void main() {
 
     select = db.select("select * from ${t1Name.fixedName} where id=3");
     row = select.first;
-    expect(row['id'], 3);
-    expect(row['name'], 'Trento');
-    expect(row['temperature'], 18.0);
+    expect(row.get('id'), 3);
+    expect(row.get('name'), 'Trento');
+    expect(row.get('temperature'), 18.0);
 
     db.close();
   });
@@ -173,7 +173,7 @@ void main() {
     var select = db.select(
         "select ${col1Name.bracketName} from ${t3Name.fixedName} where id=1");
     var row = select.first;
-    expect(row[col1Name.name], 1);
+    expect(row.get(col1Name.name), 1);
 
     var map = {
       col1Name.fixedName: 1000,
@@ -183,7 +183,7 @@ void main() {
     select = db.select(
         "select ${col1Name.bracketName} from ${t3Name.fixedName} where id=1");
     row = select.first;
-    expect(row[col1Name.name], 1000);
+    expect(row.get(col1Name.name), 1000);
 
     db.close();
   });

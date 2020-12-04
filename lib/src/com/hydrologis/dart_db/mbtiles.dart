@@ -163,7 +163,7 @@ class MBTilesDb {
 
     var result = database.select(SELECTQUERY, [zoom, tx, ty]);
     if (result.length == 1) {
-      return result.first[COL_TILES_TILE_DATA];
+      return result.first.get(COL_TILES_TILE_DATA);
     }
     return null;
   }
