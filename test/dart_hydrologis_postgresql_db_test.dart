@@ -1,3 +1,6 @@
+@Skip(
+    'Run this only if a postgres instance is available, else this will just fail.')
+
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
 
