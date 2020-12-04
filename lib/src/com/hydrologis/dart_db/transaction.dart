@@ -6,7 +6,7 @@ class Transaction {
   static final String END = "END;";
   static final String ROLLBACK = "ROLLBACK;";
 
-  final SqliteDb _db;
+  final ADb _db;
   bool _transactionOpen = false;
 
   Transaction(this._db);

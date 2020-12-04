@@ -3,14 +3,34 @@ part of dart_hydrologis_db;
 abstract class ADb {
   /// Open the database or create a new one.
   ///
-  /// If supplied the [dbCreateFunction] is used.
-  void open({Function dbCreateFunction});
+  /// If supplied the [populateFunction] is used.
+  ///
+  /// For sqlite this happens if the db didn't exist, while
+  /// for postgres the function is executed no matter what,
+  /// if available.
+  void open({Function populateFunction});
 
   /// Checks if the database is open.
   bool isOpen();
 
   /// Close the database.
   void close();
+
+  /// Get the list of table names, if necessary [doOrder].
+  List<SqlName> getTables({bool doOrder = false});
+
+  /// Check is a given [tableName] exists.
+  bool hasTable(SqlName tableName);
+
+  /// Get the [tableName] columns as array of:
+  ///   - name (string),
+  ///   - type (string),
+  ///   - isPrimaryKey (int, 1 for true)
+  ///   - notnull (int).
+  List<List<dynamic>> getTableColumns(SqlName tableName);
+
+  /// Get the primary key from a non spatial db.
+  String getPrimaryKey(SqlName tableName);
 
   /// Get a list of items defined by the [queryObj].
   ///
@@ -25,6 +45,57 @@ abstract class ADb {
   /// is set to true, the id of the last inserted row is returned.
   int execute(String sqlToExecute,
       {List<dynamic> arguments, bool getLastInsertId = false});
+
+  /// The standard query method.
+  QueryResult select(String sql, [List<dynamic> arguments]);
+
+  /// Insert a new record using a map [values] into a given [table].
+  ///
+  /// This returns the id of the inserted row.
+  int insertMap(SqlName table, Map<String, dynamic> values) {
+    List<dynamic> args = [];
+    var keys;
+    var questions;
+    values.forEach((key, value) {
+      if (keys == null) {
+        keys = key;
+        questions = "?";
+      } else {
+        keys = keys + "," + key;
+        questions = questions + ",?";
+      }
+      args.add(value);
+    });
+
+    var sql = "insert into ${table.fixedName} ( $keys ) values ( $questions );";
+    return execute(sql, arguments: args, getLastInsertId: true);
+  }
+
+  /// Update a new record using a map and a where condition.
+  ///
+  /// This returns the number of rows affected.
+  int updateMap(SqlName table, Map<String, dynamic> values, String where) {
+    List<dynamic> args = [];
+    var keysVal;
+    values.forEach((key, value) {
+      if (keysVal == null) {
+        keysVal = "$key=?";
+      } else {
+        keysVal += ",$key=?";
+      }
+      args.add(value);
+    });
+
+    var sql = "update ${table.fixedName} set $keysVal where $where;";
+    return execute(sql, arguments: args);
+  }
+
+  /// Run a set of operations inside a transaction.
+  ///
+  /// This returns whatever the function's return value is.
+  dynamic transaction(Function transactionOperations) {
+    return Transaction(this).runInTransaction(transactionOperations);
+  }
 }
 
 abstract class ASpatialDb {}

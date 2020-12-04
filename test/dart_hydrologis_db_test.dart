@@ -1,6 +1,18 @@
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
 
+const bool doPostgres = false;
+
+ADb createDb(Function onCreateFunction) {
+  if (doPostgres) {
+    throw StateError("blah");
+  } else {
+    var db = SqliteDb.memory();
+    db.open(populateFunction: onCreateFunction);
+    return db;
+  }
+}
+
 var t1Name = SqlName("table 1");
 var t2Name = SqlName("table2");
 var t3Name = SqlName("10table with,nasty");
@@ -78,8 +90,7 @@ class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
 
 void main() {
   test('test creation', () {
-    var db = SqliteDb.memory();
-    db.open(dbCreateFunction: createDbFunction);
+    var db = createDb(createDbFunction);
 
     expect(true, db.hasTable(t1Name));
     expect(true, db.hasTable(t2Name));
@@ -92,8 +103,7 @@ void main() {
     db.close();
   });
   test('test select', () {
-    var db = SqliteDb.memory();
-    db.open(dbCreateFunction: createDbFunction);
+    var db = createDb(createDbFunction);
 
     var select = db.select("select * from 'table 1' order by id");
     var row = select.first;
@@ -105,8 +115,7 @@ void main() {
     db.close();
   });
   test('test insert', () {
-    var db = SqliteDb.memory();
-    db.open(dbCreateFunction: createDbFunction);
+    var db = createDb(createDbFunction);
 
     var sql = "INSERT INTO 'table 1' VALUES(4, 'Egna', 27.0);";
     db.execute(sql);
@@ -133,8 +142,7 @@ void main() {
     db.close();
   });
   test('test update', () {
-    var db = SqliteDb.memory();
-    db.open(dbCreateFunction: createDbFunction);
+    var db = createDb(createDbFunction);
 
     var sql =
         "UPDATE  ${t1Name.fixedName} set name='Egna', temperature=27.0 where id=3;";
@@ -162,8 +170,7 @@ void main() {
   });
 
   test('test ugly names', () {
-    var db = SqliteDb.memory();
-    db.open(dbCreateFunction: createUglyDbFunction);
+    var db = createDb(createDbFunction);
 
     expect(true, db.hasTable(t3Name));
 
@@ -189,8 +196,7 @@ void main() {
   });
 
   test('test pk', () {
-    var db = SqliteDb.memory();
-    db.open(dbCreateFunction: createDbFunction);
+    var db = createDb(createDbFunction);
 
     var primaryKey = db.getPrimaryKey(t1Name);
     expect('id', primaryKey);
@@ -272,8 +278,7 @@ void main() {
   });
 
   test('test query object builder', () {
-    var db = SqliteDb.memory();
-    db.open(dbCreateFunction: createDbFunction);
+    var db = createDb(createDbFunction);
 
     Table1ObjBuilder builder = Table1ObjBuilder();
 

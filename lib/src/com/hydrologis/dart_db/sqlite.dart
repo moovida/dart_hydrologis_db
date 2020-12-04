@@ -13,7 +13,7 @@ class SqliteDb extends ADb {
   }
 
   @override
-  void open({Function dbCreateFunction}) {
+  void open({Function populateFunction}) {
     bool existsAlready;
     if (_dbPath == null) {
       _db = sqlite3.openInMemory();
@@ -25,9 +25,9 @@ class SqliteDb extends ADb {
       _db = sqlite3.open(_dbPath);
       // _db = Database.openFile(dbFile);
     }
-    if (!existsAlready && dbCreateFunction != null) {
+    if (!existsAlready && populateFunction != null) {
       // db is open already, we can use the wrapper for the create function.
-      dbCreateFunction(this);
+      populateFunction(this);
     }
   }
 
@@ -87,7 +87,7 @@ class SqliteDb extends ADb {
     }
   }
 
-  /// The standard query method.
+  @override
   QueryResult select(String sql, [List<dynamic> arguments]) {
     PreparedStatement selectStmt;
     try {
@@ -100,55 +100,7 @@ class SqliteDb extends ADb {
     }
   }
 
-  /// Insert a new record using a map [values] into a given [table].
-  ///
-  /// This returns the id of the inserted row.
-  int insertMap(SqlName table, Map<String, dynamic> values) {
-    List<dynamic> args = [];
-    var keys;
-    var questions;
-    values.forEach((key, value) {
-      if (keys == null) {
-        keys = key;
-        questions = "?";
-      } else {
-        keys = keys + "," + key;
-        questions = questions + ",?";
-      }
-      args.add(value);
-    });
-
-    var sql = "insert into ${table.fixedName} ( $keys ) values ( $questions );";
-    return execute(sql, arguments: args, getLastInsertId: true);
-  }
-
-  /// Update a new record using a map and a where condition.
-  ///
-  /// This returns the number of rows affected.
-  int updateMap(SqlName table, Map<String, dynamic> values, String where) {
-    List<dynamic> args = [];
-    var keysVal;
-    values.forEach((key, value) {
-      if (keysVal == null) {
-        keysVal = "$key=?";
-      } else {
-        keysVal += ",$key=?";
-      }
-      args.add(value);
-    });
-
-    var sql = "update ${table.fixedName} set $keysVal where $where;";
-    return execute(sql, arguments: args);
-  }
-
-  /// Run a set of operations inside a transaction.
-  ///
-  /// This returns whatever the function's return value is.
-  dynamic transaction(Function transactionOperations) {
-    return Transaction(this).runInTransaction(transactionOperations);
-  }
-
-  /// Get the list of table names, if necessary [doOrder].
+  @override
   List<SqlName> getTables({bool doOrder = false}) {
     List<SqlName> tableNames = [];
     String orderBy = " ORDER BY name";
@@ -166,7 +118,7 @@ class SqliteDb extends ADb {
     return tableNames;
   }
 
-  /// Check is a given [tableName] exists.
+  @override
   bool hasTable(SqlName tableName) {
     String sql = """
       SELECT count(name) FROM sqlite_master WHERE type='table' 
@@ -182,11 +134,7 @@ class SqliteDb extends ADb {
     return false;
   }
 
-  /// Get the [tableName] columns as array of:
-  ///   - name (string),
-  ///   - type (string),
-  ///   - isPrimaryKey (int, 1 for true)
-  ///   - notnull (int).
+  @override
   List<List<dynamic>> getTableColumns(SqlName tableName) {
     String sql = "PRAGMA table_info(${tableName.fixedName})";
     List<List<dynamic>> columnsList = [];
@@ -202,7 +150,7 @@ class SqliteDb extends ADb {
     return columnsList;
   }
 
-  /// Get the primary key from a non spatial db.
+  @override
   String getPrimaryKey(SqlName tableName) {
     String sql = "PRAGMA table_info(${tableName.fixedName})";
     var res = select(sql);

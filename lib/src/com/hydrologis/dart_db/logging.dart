@@ -185,7 +185,7 @@ class LogDb {
       SLogger().i("Init LogDb with folder: $folder and app name: $DB_NAME");
       _dbPath = joinPaths(folder, DB_NAME);
       _db = SqliteDb(_dbPath);
-      _db.open(dbCreateFunction: createLogDatabase);
+      _db.open(populateFunction: createLogDatabase);
     } catch (e, s) {
       SLogger().e("Error initializing LogDb", s);
       return false;
