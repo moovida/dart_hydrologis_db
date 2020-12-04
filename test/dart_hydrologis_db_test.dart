@@ -170,7 +170,7 @@ void main() {
   });
 
   test('test ugly names', () {
-    var db = createDb(createDbFunction);
+    var db = createDb(createUglyDbFunction);
 
     expect(true, db.hasTable(t3Name));
 
