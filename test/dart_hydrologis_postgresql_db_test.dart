@@ -87,10 +87,10 @@ class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
 }
 
 void main() {
-  PostgresDb db;
+  PostgresqlDb db;
 
   setUpAll(() {
-    db = PostgresDb(
+    db = PostgresqlDb(
       "localhost",
       "test",
       port: 5432,
