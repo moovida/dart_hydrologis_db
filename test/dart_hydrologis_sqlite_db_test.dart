@@ -1,16 +1,10 @@
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
 
-const bool doPostgres = false;
-
 ADb createDb(Function onCreateFunction) {
-  if (doPostgres) {
-    throw StateError("blah");
-  } else {
-    var db = SqliteDb.memory();
-    db.open(populateFunction: onCreateFunction);
-    return db;
-  }
+  var db = SqliteDb.memory();
+  db.open(populateFunction: onCreateFunction);
+  return db;
 }
 
 var t1Name = SqlName("table 1");
@@ -67,15 +61,15 @@ class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
   @override
   Table1Obj fromMap(dynamic map) {
     Table1Obj obj = Table1Obj()
-      ..id = map['id']
-      ..name = map['name']
-      ..temperature = map['temperature'];
+      ..id = map.get('id')
+      ..name = map.get('name')
+      ..temperature = map.get('temperature');
     return obj;
   }
 
   @override
   String querySql() {
-    return "select id, name, temperature from 'table 1' order by id;";
+    return "select id, name, temperature from ${t1Name.fixedName}";
   }
 
   @override
@@ -283,7 +277,8 @@ void main() {
     Table1ObjBuilder builder = Table1ObjBuilder();
 
     List<Table1Obj> objectsList =
-        db.getQueryObjectsList(builder, whereString: "id=1");
+        db.getQueryObjectsList(builder, whereString: "id=1 order by id");
+    expect(objectsList.length, 1);
     expect(objectsList.first.id, 1);
     expect(objectsList.first.name, 'Tscherms');
     expect(objectsList.first.temperature, 36.0);

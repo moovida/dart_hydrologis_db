@@ -13,6 +13,11 @@ class SqliteDb extends ADb {
   }
 
   @override
+  bool isAsync() {
+    return false;
+  }
+
+  @override
   void open({Function populateFunction}) {
     bool existsAlready;
     if (_dbPath == null) {
@@ -51,20 +56,6 @@ class SqliteDb extends ADb {
   /// which forces to use the method from the moor database.
   Database getInternalDb() {
     return _db;
-  }
-
-  @override
-  List<T> getQueryObjectsList<T>(QueryObjectBuilder<T> queryObj,
-      {whereString = ""}) {
-    String querySql = "${queryObj.querySql()} $whereString";
-
-    List<T> items = [];
-    var res = select(querySql);
-    res.forEach((row) {
-      var obj = queryObj.fromMap(row);
-      items.add(obj);
-    });
-    return items;
   }
 
   @override
@@ -141,10 +132,10 @@ class SqliteDb extends ADb {
 
     var res = select(sql);
     res.forEach((row) {
-      String colName = row['name'];
-      String colType = row['type'];
-      int isPk = row['pk'];
-      int notNull = row['notnull'];
+      String colName = row.get('name');
+      String colType = row.get('type');
+      int isPk = row.get('pk');
+      int notNull = row.get('notnull');
       columnsList.add([colName, colType, isPk, notNull]);
     });
     return columnsList;

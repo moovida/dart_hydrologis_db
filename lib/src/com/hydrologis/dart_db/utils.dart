@@ -110,6 +110,26 @@ class DbsUtilities {
     return name;
   }
 
+  /// Check the tablename and fix it if necessary.
+  ///
+  /// @param name the name to check.
+  /// @return the fixed name.
+  static String fixWithDoubleQuotes(String name) {
+    if (name[0] == '\"') {
+      // already fixed
+      return name;
+    }
+    double num = double.tryParse(name.substring(0, 1));
+
+    if (num != null ||
+        name.contains("-") ||
+        name.contains(",") ||
+        name.contains(RegExp(r'\s+'))) {
+      return "\"" + name + "\"";
+    }
+    return name;
+  }
+
   /// Check the columnName and fix it if necessary.
   ///
   /// @param name the name to check.
@@ -142,6 +162,11 @@ class SqlName {
   /// This might be needed for strange table names.
   final String fixedName;
 
+  /// The name fixed by double quoting, if necessary.
+  ///
+  /// This might be needed for strange table names in some cases (ex. create table on postgresql).
+  final String fixedDoubleName;
+
   /// The name fixed by surrounding with square brackets, if necessary.
   ///
   /// This might be needed for example in select queries for strange column names.
@@ -149,5 +174,6 @@ class SqlName {
 
   SqlName(this.name)
       : fixedName = DbsUtilities.fixWithQuotes(name),
-        bracketName = DbsUtilities.fixWithBrackets(name);
+        bracketName = DbsUtilities.fixWithBrackets(name),
+        fixedDoubleName = DbsUtilities.fixWithDoubleQuotes(name);
 }
