@@ -1,3 +1,7 @@
+## 0.5.0
+
+- add first simple postgresql support.
+
 ## 0.4.1
 
 - add notnull to table column info.
