@@ -314,4 +314,20 @@ class QueryResultRow {
     }
     throw StateError("No query result defined.");
   }
+
+  /// Run a function taking a a key and its value on the whole [QueryResultRow].
+  void forEach(Function keyValueFunction) {
+    if (resultSetRow != null) {
+      resultSetRow.forEach((key, value) {
+        keyValueFunction(key, value);
+      });
+      return;
+    } else if (postgreSQLResultRow != null) {
+      postgreSQLResultRow.toColumnMap().forEach((key, value) {
+        keyValueFunction(key, value);
+      });
+      return;
+    }
+    throw StateError("No query result defined.");
+  }
 }

@@ -103,7 +103,7 @@ class SqliteDb extends ADb {
             orderBy;
     var res = select(sql);
     res.forEach((row) {
-      var name = row['name'];
+      var name = row.get('name');
       tableNames.add(SqlName(name));
     });
     return tableNames;
