@@ -1,93 +1,8 @@
-@Skip(
-    'Run this only if a postgres instance is available, else this will just fail.')
+// @Skip(
+//     'Run this only if a postgres instance is available, else this will just fail.')
 
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
-
-var t1Name = SqlName("table 1");
-var t2Name = SqlName("table2");
-var t3Name = SqlName("10table with,nasty");
-var col1Name = SqlName("10col with,nasty");
-
-var dropTable1 = '''
-drop table if exists ${t1Name.fixedDoubleName} cascade;
-''';
-
-var createTable1 = '''
-CREATE TABLE ${t1Name.fixedDoubleName} (
-  id SERIAL PRIMARY KEY, 
-  name TEXT,  
-  temperature REAL
-);
-''';
-
-var insertTable1 = [
-  "INSERT INTO ${t1Name.fixedDoubleName} VALUES(1, 'Tscherms', 36.0);", //
-  "INSERT INTO ${t1Name.fixedDoubleName} VALUES(2, 'Meran', 34.0);", //
-  "INSERT INTO ${t1Name.fixedDoubleName} VALUES(3, 'Bozen', 42.0);", //
-];
-
-var dropTable2 = '''
-  drop table if exists ${t2Name.fixedDoubleName} cascade;
-  ''';
-var createTable2 = '''
-  CREATE TABLE ${t2Name.fixedDoubleName} (  
-    id SERIAL PRIMARY KEY, 
-    table1id INTEGER,  
-    FOREIGN KEY (table1id) REFERENCES ${t1Name.fixedDoubleName} (id)
-  );
-  ''';
-var insertTable2 = [
-  "INSERT INTO ${t2Name.fixedDoubleName} VALUES(1, 1);", //
-  "INSERT INTO ${t2Name.fixedDoubleName} VALUES(2, 2);", //
-  "INSERT INTO ${t2Name.fixedDoubleName} VALUES(3, 3);", //
-];
-
-var dropTable3 = '''
-  drop table if exists ${t3Name.fixedDoubleName} cascade;
-  ''';
-var createTable3 = '''
-  CREATE TABLE ${t3Name.fixedDoubleName} (  
-    id SERIAL PRIMARY KEY, 
-    ${col1Name.fixedDoubleName} INTEGER
-  );
-  ''';
-var insertTable3 = [
-  "INSERT INTO ${t3Name.fixedDoubleName} VALUES(1, 1);", //
-  "INSERT INTO ${t3Name.fixedDoubleName} VALUES(2, 2);", //
-  "INSERT INTO ${t3Name.fixedDoubleName} VALUES(3, 3);", //
-];
-
-class Table1Obj {
-  int id;
-  String name;
-  double temperature;
-}
-
-class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
-  @override
-  Table1Obj fromMap(dynamic map) {
-    Table1Obj obj = Table1Obj()
-      ..id = map.get('id')
-      ..name = map.get('name')
-      ..temperature = map.get('temperature');
-    return obj;
-  }
-
-  @override
-  String querySql() {
-    return "select id, name, temperature from ${t1Name.fixedDoubleName}";
-  }
-
-  @override
-  Map<String, dynamic> toMap(Table1Obj obj) {
-    return {
-      'id': obj.id,
-      'name': obj.name,
-      'temperature': obj.temperature,
-    };
-  }
-}
 
 void main() {
   PostgresqlDb db;
@@ -97,8 +12,8 @@ void main() {
       "localhost",
       "test",
       port: 5432,
-      user: "test",
-      pwd: "test",
+      user: "postgres",
+      // pwd: "postgres",
     );
     return db.open(populateFunction: createDbFunction);
   });
@@ -306,5 +221,90 @@ Future<void> createUglyDbFunction(ADbAsync _db) async {
   await _db.execute(createTable3);
   for (var sql in insertTable3) {
     await _db.execute(sql);
+  }
+}
+
+var t1Name = SqlName("table 1");
+var t2Name = SqlName("table2");
+var t3Name = SqlName("10table with,nasty");
+var col1Name = SqlName("10col with,nasty");
+
+var dropTable1 = '''
+drop table if exists ${t1Name.fixedDoubleName} cascade;
+''';
+
+var createTable1 = '''
+CREATE TABLE ${t1Name.fixedDoubleName} (
+  id SERIAL PRIMARY KEY, 
+  name TEXT,  
+  temperature REAL
+);
+''';
+
+var insertTable1 = [
+  "INSERT INTO ${t1Name.fixedDoubleName} VALUES(1, 'Tscherms', 36.0);", //
+  "INSERT INTO ${t1Name.fixedDoubleName} VALUES(2, 'Meran', 34.0);", //
+  "INSERT INTO ${t1Name.fixedDoubleName} VALUES(3, 'Bozen', 42.0);", //
+];
+
+var dropTable2 = '''
+  drop table if exists ${t2Name.fixedDoubleName} cascade;
+  ''';
+var createTable2 = '''
+  CREATE TABLE ${t2Name.fixedDoubleName} (  
+    id SERIAL PRIMARY KEY, 
+    table1id INTEGER,  
+    FOREIGN KEY (table1id) REFERENCES ${t1Name.fixedDoubleName} (id)
+  );
+  ''';
+var insertTable2 = [
+  "INSERT INTO ${t2Name.fixedDoubleName} VALUES(1, 1);", //
+  "INSERT INTO ${t2Name.fixedDoubleName} VALUES(2, 2);", //
+  "INSERT INTO ${t2Name.fixedDoubleName} VALUES(3, 3);", //
+];
+
+var dropTable3 = '''
+  drop table if exists ${t3Name.fixedDoubleName} cascade;
+  ''';
+var createTable3 = '''
+  CREATE TABLE ${t3Name.fixedDoubleName} (  
+    id SERIAL PRIMARY KEY, 
+    ${col1Name.fixedDoubleName} INTEGER
+  );
+  ''';
+var insertTable3 = [
+  "INSERT INTO ${t3Name.fixedDoubleName} VALUES(1, 1);", //
+  "INSERT INTO ${t3Name.fixedDoubleName} VALUES(2, 2);", //
+  "INSERT INTO ${t3Name.fixedDoubleName} VALUES(3, 3);", //
+];
+
+class Table1Obj {
+  int id;
+  String name;
+  double temperature;
+}
+
+class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
+  @override
+  Table1Obj fromMap(dynamic map) {
+    Table1Obj obj = Table1Obj()
+      ..id = map.get('id')
+      ..name = map.get('name')
+      ..temperature = map.get('temperature');
+    return obj;
+  }
+
+  @override
+  String querySql() {
+    return "select id, name, temperature from ${t1Name.fixedDoubleName}";
+  }
+
+  @override
+  Map<String, dynamic> toMap(Table1Obj obj) {
+    return {
+      'id': obj.id,
+      'name': obj.name,
+      'temperature': obj.temperature,
+    };
   }
 }
