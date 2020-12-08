@@ -229,6 +229,9 @@ class PostgresqlDb extends ADbAsync {
   @override
   Future<String> getPrimaryKey(SqlName tableName) async {
     var queryResult = await select(getIndexSql(tableName));
+    if (queryResult.length == 0) {
+      return null;
+    }
     var queryResultRow = queryResult.first;
     String pkName;
     String indexName = queryResultRow.get("index_name").toString();
