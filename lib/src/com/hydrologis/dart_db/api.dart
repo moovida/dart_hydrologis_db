@@ -34,12 +34,17 @@ abstract class ADb {
 
   /// Get a list of items defined by the [queryObj].
   ///
-  /// Optionally a custom [whereString] piece can be passed in. This needs to start with the word where.
+  /// Optionally a custom [whereString] piece can be passed in.
+  /// It can start with the keyword where.
   List<T> getQueryObjectsList<T>(QueryObjectBuilder<T> queryObj,
       {String whereString = ""}) {
     String querySql = "${queryObj.querySql()}";
     if (whereString != null && whereString.isNotEmpty) {
-      querySql += " where $whereString";
+      if (whereString.trim().toLowerCase().startsWith("where")) {
+        querySql += whereString;
+      } else {
+        querySql += " where $whereString";
+      }
     }
 
     List<T> items = [];
