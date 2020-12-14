@@ -176,8 +176,8 @@ class PostgresqlDb extends ADbAsync {
         and table_name != 'raster_overviews'
         $orderBy;""";
     var res = await select(sql);
-    res.forEach((row) {
-      var name = row['table_name'];
+    res.forEach((QueryResultRow row) {
+      var name = row.get('table_name');
       tableNames.add(SqlName(name));
     });
     return tableNames;
