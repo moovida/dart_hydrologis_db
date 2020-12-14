@@ -162,7 +162,7 @@ class PostgresqlDb extends ADbAsync {
   @override
   Future<List<SqlName>> getTables({bool doOrder = false}) async {
     List<SqlName> tableNames = [];
-    String orderBy = " ORDER BY name";
+    String orderBy = " ORDER BY table_name";
     if (!doOrder) {
       orderBy = "";
     }
