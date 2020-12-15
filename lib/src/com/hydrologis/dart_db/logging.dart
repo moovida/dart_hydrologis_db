@@ -116,12 +116,6 @@ class GpLogItemQueryBuilder extends QueryObjectBuilder<GpLogItem> {
   }
 
   @override
-  String insertSql() {
-    // UNUSED
-    return null;
-  }
-
-  @override
   String querySql() {
     String sql = '''
         SELECT ${LogDb.level_NAME}, ${LogDb.message_NAME}, ${LogDb.TimeStamp_NAME}
