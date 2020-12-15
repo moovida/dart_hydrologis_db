@@ -1,3 +1,7 @@
+## 0.6.0
+
+- Force the error debug message to be completed with Exception adn Stacktrace.
+
 ## 0.5.1
 
 - QueryObjectBuilder method change to reflect new api and avoid downstream confusion.

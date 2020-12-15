@@ -69,14 +69,20 @@ class SLogger {
     }
   }
 
-  void e(dynamic message, [StackTrace stackTrace]) {
+  void e(dynamic message, Exception e, StackTrace stackTrace) {
     _logDb?.put(Level.error, message);
+    if (e != null) {
+      _logDb?.put(Level.error, "Exception: $e");
+    }
     if (stackTrace != null) {
       _logDb?.put(Level.error, Trace.format(stackTrace));
     }
     if (doConsoleLogging) {
       print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       print("e: ${message.toString()}");
+      if (e != null) {
+        print(e);
+      }
       if (stackTrace != null) {
         print(stackTrace);
       }
@@ -181,7 +187,7 @@ class LogDb {
       _db = SqliteDb(_dbPath);
       _db.open(populateFunction: createLogDatabase);
     } catch (e, s) {
-      SLogger().e("Error initializing LogDb", s);
+      SLogger().e("Error initializing LogDb", e, s);
       return false;
     }
     return true;

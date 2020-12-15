@@ -47,7 +47,7 @@ class Transaction {
       closeTransaction();
       return result;
     } catch (e, s) {
-      SLogger().e("Error during transaction.", s);
+      SLogger().e("Error during transaction.", e, s);
       rollback();
     }
     return null;
@@ -100,7 +100,7 @@ class TransactionAsync {
       await closeTransaction();
       return result;
     } catch (e, s) {
-      SLogger().e("Error during transaction.", s);
+      SLogger().e("Error during transaction.", e, s);
       await rollback();
     }
     return null;
