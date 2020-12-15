@@ -208,8 +208,8 @@ Future<void> createDbFunction(ADbAsync _db) async {
     for (var sql in insertTable2) {
       await _db.execute(sql);
     }
-  } on Exception catch (e) {
-    print(e);
+  } on Exception catch (e, s) {
+    SLogger().e("Error on db creation.", e, s);
   }
 }
 

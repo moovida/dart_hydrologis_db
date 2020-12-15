@@ -186,7 +186,7 @@ class LogDb {
       _dbPath = joinPaths(folder, DB_NAME);
       _db = SqliteDb(_dbPath);
       _db.open(populateFunction: createLogDatabase);
-    } catch (e, s) {
+    } on Exception catch (e, s) {
       SLogger().e("Error initializing LogDb", e, s);
       return false;
     }

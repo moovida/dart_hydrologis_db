@@ -83,7 +83,7 @@ class PostgresqlDb extends ADbAsync {
       } else {
         return sqlResult.affectedRowCount;
       }
-    } catch (e, s) {
+    } on Exception catch (e, s) {
       SLogger().e("Execute error.", e, s);
     }
     return null;
@@ -105,7 +105,7 @@ class PostgresqlDb extends ADbAsync {
     try {
       var sqlResult = await _db.query(sql, substitutionValues: paramsMap);
       return QueryResult.fromPostgresqlResult(sqlResult);
-    } catch (ex, s) {
+    } on Exception catch (ex, s) {
       SLogger().e("Execute error.", ex, s);
     }
     return null;

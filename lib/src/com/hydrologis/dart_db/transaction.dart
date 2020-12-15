@@ -46,7 +46,7 @@ class Transaction {
       dynamic result = function(_db);
       closeTransaction();
       return result;
-    } catch (e, s) {
+    } on Exception catch (e, s) {
       SLogger().e("Error during transaction.", e, s);
       rollback();
     }
@@ -99,7 +99,7 @@ class TransactionAsync {
       dynamic result = await function(_db);
       await closeTransaction();
       return result;
-    } catch (e, s) {
+    } on Exception catch (e, s) {
       SLogger().e("Error during transaction.", e, s);
       await rollback();
     }
