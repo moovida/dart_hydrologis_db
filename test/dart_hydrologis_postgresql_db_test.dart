@@ -286,7 +286,7 @@ class Table1Obj {
 
 class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
   @override
-  Table1Obj fromMap(dynamic map) {
+  Table1Obj fromRow(QueryResultRow map) {
     Table1Obj obj = Table1Obj()
       ..id = map.get('id')
       ..name = map.get('name')
