@@ -1,3 +1,7 @@
+## 0.5.1
+
+- QueryObjectBuilder method change to reflect new api and avoid downstream confusion.
+
 ## 0.5.0
 
 - add first simple postgresql support.
