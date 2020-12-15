@@ -107,11 +107,11 @@ class GpLogItemQueryBuilder extends QueryObjectBuilder<GpLogItem> {
   var limit;
 
   @override
-  GpLogItem fromMap(dynamic map) {
+  GpLogItem fromRow(QueryResultRow map) {
     GpLogItem l = GpLogItem()
-      ..level = map[LogDb.level_NAME]
-      ..message = map[LogDb.message_NAME]
-      ..ts = map[LogDb.TimeStamp_NAME];
+      ..level = map.get(LogDb.level_NAME)
+      ..message = map.get(LogDb.message_NAME)
+      ..ts = map.get(LogDb.TimeStamp_NAME);
     return l;
   }
 

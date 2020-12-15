@@ -49,8 +49,8 @@ abstract class ADb {
 
     List<T> items = [];
     var res = select(querySql);
-    res.forEach((row) {
-      var obj = queryObj.fromMap(row);
+    res.forEach((QueryResultRow row) {
+      var obj = queryObj.fromRow(row);
       items.add(obj);
     });
     return items;
@@ -160,8 +160,8 @@ abstract class ADbAsync {
 
     List<T> items = [];
     var res = await select(querySql);
-    res.forEach((row) {
-      var obj = queryObj.fromMap(row);
+    res.forEach((QueryResultRow row) {
+      var obj = queryObj.fromRow(row);
       items.add(obj);
     });
     return items;
