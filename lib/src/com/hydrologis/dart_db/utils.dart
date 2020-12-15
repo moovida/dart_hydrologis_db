@@ -5,8 +5,8 @@ abstract class QueryObjectBuilder<T> {
 
   Map<String, dynamic> toMap(T item);
 
-  /// Extract the item from a [key, value] object.
-  T fromMap(dynamic map);
+  /// Extract the item from resultobject row.
+  T fromRow(QueryResultRow row);
 }
 
 class SqliteTypes {
