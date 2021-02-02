@@ -1,3 +1,7 @@
+## 0.6.1
+
+- deps libs upgrade.
+
 ## 0.6.0
 
 - Force the error debug message to be completed with Exception adn Stacktrace.
