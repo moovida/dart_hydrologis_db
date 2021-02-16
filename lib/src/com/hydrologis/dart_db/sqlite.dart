@@ -102,7 +102,7 @@ class SqliteDb extends ADb {
         "SELECT name FROM sqlite_master WHERE type='table' or type='view'" +
             orderBy;
     var res = select(sql);
-    res.forEach((row) {
+    res.forEach((QueryResultRow row) {
       var name = row.get('name');
       tableNames.add(SqlName(name));
     });
@@ -131,7 +131,7 @@ class SqliteDb extends ADb {
     List<List<dynamic>> columnsList = [];
 
     var res = select(sql);
-    res.forEach((row) {
+    res.forEach((QueryResultRow row) {
       String colName = row.get('name');
       String colType = row.get('type');
       int isPk = row.get('pk');

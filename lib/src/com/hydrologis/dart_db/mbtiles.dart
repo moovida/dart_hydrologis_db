@@ -288,7 +288,7 @@ class MBTilesDb {
       metadataMap = {};
 
       var res = database.select(SELECT_METADATA);
-      res.forEach((row) {
+      res.forEach((QueryResultRow row) {
         metadataMap[row.get(COL_METADATA_NAME).toLowerCase()] =
             row.get(COL_METADATA_VALUE);
       });
