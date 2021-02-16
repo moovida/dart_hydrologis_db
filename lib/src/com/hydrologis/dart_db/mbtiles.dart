@@ -289,8 +289,8 @@ class MBTilesDb {
 
       var res = database.select(SELECT_METADATA);
       res.forEach((row) {
-        metadataMap[row[COL_METADATA_NAME].toLowerCase()] =
-            row[COL_METADATA_VALUE];
+        metadataMap[row.get(COL_METADATA_NAME).toLowerCase()] =
+            row.get(COL_METADATA_VALUE);
       });
     }
   }

@@ -1,3 +1,7 @@
+## 0.6.2
+
+- fix for mbtiles metadata reading bug.
+
 ## 0.6.1
 
 - deps libs upgrade.

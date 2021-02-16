@@ -229,16 +229,16 @@ abstract class ADbAsync {
 }
 
 class QueryResult {
-  ResultSet resultSet;
+  ResultSet sqliteResultSet;
   PostgreSQLResult postgreSQLResult;
 
-  QueryResult.fromResultSet(this.resultSet);
+  QueryResult.fromResultSet(this.sqliteResultSet);
 
   QueryResult.fromPostgresqlResult(this.postgreSQLResult);
 
   int get length {
-    if (resultSet != null) {
-      return resultSet.length;
+    if (sqliteResultSet != null) {
+      return sqliteResultSet.length;
     } else if (postgreSQLResult != null) {
       return postgreSQLResult.length;
     }
@@ -246,8 +246,8 @@ class QueryResult {
   }
 
   QueryResultRow get first {
-    if (resultSet != null) {
-      return QueryResultRow.fromResultSetRow(resultSet.first);
+    if (sqliteResultSet != null) {
+      return QueryResultRow.fromSqliteResultSetRow(sqliteResultSet.first);
     } else if (postgreSQLResult != null) {
       return QueryResultRow.fromPostgresqlResultSetRow(postgreSQLResult.first);
     }
@@ -256,9 +256,9 @@ class QueryResult {
 
   /// Run a function taking a [QueryResultRow] on the whole [QueryResult].
   void forEach(Function rowFunction) {
-    if (resultSet != null) {
-      resultSet.forEach((row) {
-        rowFunction(QueryResultRow.fromResultSetRow(row));
+    if (sqliteResultSet != null) {
+      sqliteResultSet.forEach((row) {
+        rowFunction(QueryResultRow.fromSqliteResultSetRow(row));
       });
       return;
     } else if (postgreSQLResult != null) {
@@ -272,11 +272,11 @@ class QueryResult {
 
   /// Find the [QueryResultRow] given a field and value.
   QueryResultRow find(String field, dynamic value) {
-    if (resultSet != null) {
-      for (var map in resultSet) {
+    if (sqliteResultSet != null) {
+      for (var map in sqliteResultSet) {
         var checkValue = map[field];
         if (checkValue == value) {
-          return QueryResultRow.fromResultSetRow(map);
+          return QueryResultRow.fromSqliteResultSetRow(map);
         }
       }
       return null;
@@ -295,16 +295,16 @@ class QueryResult {
 }
 
 class QueryResultRow {
-  Row resultSetRow;
+  Row sqliteResultSetRow;
   PostgreSQLResultRow postgreSQLResultRow;
 
-  QueryResultRow.fromResultSetRow(this.resultSetRow);
+  QueryResultRow.fromSqliteResultSetRow(this.sqliteResultSetRow);
 
   QueryResultRow.fromPostgresqlResultSetRow(this.postgreSQLResultRow);
 
   dynamic get(String filedName) {
-    if (resultSetRow != null) {
-      return resultSetRow[filedName];
+    if (sqliteResultSetRow != null) {
+      return sqliteResultSetRow[filedName];
     } else if (postgreSQLResultRow != null) {
       return postgreSQLResultRow.toColumnMap()[filedName];
     }
@@ -312,8 +312,8 @@ class QueryResultRow {
   }
 
   dynamic getAt(int index) {
-    if (resultSetRow != null) {
-      return resultSetRow.columnAt(index);
+    if (sqliteResultSetRow != null) {
+      return sqliteResultSetRow.columnAt(index);
     } else if (postgreSQLResultRow != null) {
       return postgreSQLResultRow[index];
     }
@@ -322,8 +322,8 @@ class QueryResultRow {
 
   /// Run a function taking a a key and its value on the whole [QueryResultRow].
   void forEach(Function keyValueFunction) {
-    if (resultSetRow != null) {
-      resultSetRow.forEach((key, value) {
+    if (sqliteResultSetRow != null) {
+      sqliteResultSetRow.forEach((key, value) {
         keyValueFunction(key, value);
       });
       return;
