@@ -11,7 +11,7 @@ dependencies:
  path: ^1.7.0
 
  # MIT
- sqlite3: ^0.1.8
+ sqlite3: ^1.0.0
 
  # BSD 
  postgres: ^2.2.0
