@@ -80,6 +80,11 @@ class PostgresqlDb extends ADbAsync {
       if (getLastInsertId) {
         throw Exception("Not implemented");
         // return _db.lastInsertRowId;
+
+        // TODO this is now supported as
+        // final primaryKeyName = 'id';
+        // final res = await yourConnection.query('INSERT INTO $tableName ($keys) VALUES ($values) RETURNING $primaryKeyName;');
+        // final lastInsertedId = res.last[0] as int;
       } else {
         return sqlResult.affectedRowCount;
       }

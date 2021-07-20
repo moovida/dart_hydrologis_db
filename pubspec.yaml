@@ -1,6 +1,6 @@
 name: dart_hydrologis_db
 description: Dart based db utilities.
-version: 0.6.2+1
+version: 0.6.3
 repository: https://github.com/moovida/dart_hydrologis_db
 issue_tracker: https://github.com/moovida/dart_hydrologis_db/issues
 
@@ -8,16 +8,16 @@ environment:
   sdk: '>=2.8.1 <3.0.0'
 
 dependencies:
- path: ^1.7.0
+ path: ^1.8.0
 
  # MIT
- sqlite3: '>=0.1.8 <=1.0.0'
+ sqlite3: ^1.1.2
 
  # BSD 
- postgres: ^2.2.0
+ postgres: ^2.3.2
 
  # BSD
- stack_trace: ^1.9.3
+ stack_trace: ^1.10.0
 
 dev_dependencies:
   pedantic: ^1.9.0
