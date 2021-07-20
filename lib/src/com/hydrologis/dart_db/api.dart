@@ -30,7 +30,7 @@ abstract class ADb {
   List<List<dynamic>> getTableColumns(SqlName tableName);
 
   /// Get the primary key from a non spatial db.
-  String getPrimaryKey(SqlName tableName);
+  String? getPrimaryKey(SqlName tableName);
 
   /// Get a list of items defined by the [queryObj].
   ///
@@ -61,7 +61,7 @@ abstract class ADb {
   ///
   /// This returns the number of affected rows. Only if [getLastInsertId]
   /// is set to true, the id of the last inserted row is returned.
-  int execute(String sqlToExecute,
+  int? execute(String sqlToExecute,
       {List<dynamic> arguments, bool getLastInsertId = false});
 
   /// The standard query method.
@@ -70,7 +70,7 @@ abstract class ADb {
   /// Insert a new record using a map [values] into a given [table].
   ///
   /// This returns the id of the inserted row.
-  int insertMap(SqlName table, Map<String, dynamic> values) {
+  int? insertMap(SqlName table, Map<String, dynamic> values) {
     List<dynamic> args = [];
     var keys;
     var questions;
@@ -92,7 +92,7 @@ abstract class ADb {
   /// Update a new record using a map and a where condition.
   ///
   /// This returns the number of rows affected.
-  int updateMap(SqlName table, Map<String, dynamic> values, String where) {
+  int? updateMap(SqlName table, Map<String, dynamic> values, String where) {
     List<dynamic> args = [];
     var keysVal;
     values.forEach((key, value) {
@@ -146,7 +146,7 @@ abstract class ADbAsync {
   Future<List<List<dynamic>>> getTableColumns(SqlName tableName);
 
   /// Get the primary key for a given table.
-  Future<String> getPrimaryKey(SqlName tableName);
+  Future<String?> getPrimaryKey(SqlName tableName);
 
   /// Get a list of items defined by the [queryObj].
   ///
@@ -160,7 +160,7 @@ abstract class ADbAsync {
 
     List<T> items = [];
     var res = await select(querySql);
-    res.forEach((QueryResultRow row) {
+    res?.forEach((QueryResultRow row) {
       var obj = queryObj.fromRow(row);
       items.add(obj);
     });
@@ -172,16 +172,16 @@ abstract class ADbAsync {
   ///
   /// This returns the number of affected rows. Only if [getLastInsertId]
   /// is set to true, the id of the last inserted row is returned.
-  Future<int> execute(String sqlToExecute,
+  Future<int?> execute(String sqlToExecute,
       {List<dynamic> arguments, bool getLastInsertId = false});
 
   /// The standard query method.
-  Future<QueryResult> select(String sql, [List<dynamic> arguments]);
+  Future<QueryResult?> select(String sql, [List<dynamic> arguments]);
 
   /// Insert a new record using a map [values] into a given [table].
   ///
   /// This returns the id of the inserted row.
-  Future<int> insertMap(SqlName table, Map<String, dynamic> values) async {
+  Future<int?> insertMap(SqlName table, Map<String, dynamic> values) async {
     List<dynamic> args = [];
     var keys;
     var questions;
@@ -203,7 +203,7 @@ abstract class ADbAsync {
   /// Update a new record using a map and a where condition.
   ///
   /// This returns the number of rows affected.
-  Future<int> updateMap(
+  Future<int?> updateMap(
       SqlName table, Map<String, dynamic> values, String where) async {
     List<dynamic> args = [];
     var keysVal;
@@ -223,14 +223,14 @@ abstract class ADbAsync {
   /// Run a set of operations inside a transaction.
   ///
   /// This returns whatever the function's return value is.
-  Future<dynamic> transaction(Function transactionOperations) async {
+  Future<dynamic>? transaction(Function transactionOperations) async {
     return await TransactionAsync(this).runInTransaction(transactionOperations);
   }
 }
 
 class QueryResult {
-  ResultSet sqliteResultSet;
-  PostgreSQLResult postgreSQLResult;
+  ResultSet? sqliteResultSet;
+  PostgreSQLResult? postgreSQLResult;
 
   QueryResult.fromResultSet(this.sqliteResultSet);
 
@@ -238,18 +238,18 @@ class QueryResult {
 
   int get length {
     if (sqliteResultSet != null) {
-      return sqliteResultSet.length;
+      return sqliteResultSet!.length;
     } else if (postgreSQLResult != null) {
-      return postgreSQLResult.length;
+      return postgreSQLResult!.length;
     }
     throw StateError("No query result defined.");
   }
 
   QueryResultRow get first {
     if (sqliteResultSet != null) {
-      return QueryResultRow.fromSqliteResultSetRow(sqliteResultSet.first);
+      return QueryResultRow.fromSqliteResultSetRow(sqliteResultSet!.first);
     } else if (postgreSQLResult != null) {
-      return QueryResultRow.fromPostgresqlResultSetRow(postgreSQLResult.first);
+      return QueryResultRow.fromPostgresqlResultSetRow(postgreSQLResult!.first);
     }
     throw StateError("No query result defined.");
   }
@@ -257,12 +257,12 @@ class QueryResult {
   /// Run a function taking a [QueryResultRow] on the whole [QueryResult].
   void forEach(Function rowFunction) {
     if (sqliteResultSet != null) {
-      sqliteResultSet.forEach((row) {
+      sqliteResultSet!.forEach((row) {
         rowFunction(QueryResultRow.fromSqliteResultSetRow(row));
       });
       return;
     } else if (postgreSQLResult != null) {
-      postgreSQLResult.forEach((row) {
+      postgreSQLResult!.forEach((row) {
         rowFunction(QueryResultRow.fromPostgresqlResultSetRow(row));
       });
       return;
@@ -271,9 +271,9 @@ class QueryResult {
   }
 
   /// Find the [QueryResultRow] given a field and value.
-  QueryResultRow find(String field, dynamic value) {
+  QueryResultRow? find(String field, dynamic value) {
     if (sqliteResultSet != null) {
-      for (var map in sqliteResultSet) {
+      for (var map in sqliteResultSet!) {
         var checkValue = map[field];
         if (checkValue == value) {
           return QueryResultRow.fromSqliteResultSetRow(map);
@@ -281,7 +281,7 @@ class QueryResult {
       }
       return null;
     } else if (postgreSQLResult != null) {
-      for (var map in postgreSQLResult) {
+      for (var map in postgreSQLResult!) {
         var columnMap = map.toColumnMap();
         var checkValue = columnMap[field];
         if (checkValue == value) {
@@ -295,8 +295,8 @@ class QueryResult {
 }
 
 class QueryResultRow {
-  Row sqliteResultSetRow;
-  PostgreSQLResultRow postgreSQLResultRow;
+  Row? sqliteResultSetRow;
+  PostgreSQLResultRow? postgreSQLResultRow;
 
   QueryResultRow.fromSqliteResultSetRow(this.sqliteResultSetRow);
 
@@ -304,18 +304,18 @@ class QueryResultRow {
 
   dynamic get(String filedName) {
     if (sqliteResultSetRow != null) {
-      return sqliteResultSetRow[filedName];
+      return sqliteResultSetRow![filedName];
     } else if (postgreSQLResultRow != null) {
-      return postgreSQLResultRow.toColumnMap()[filedName];
+      return postgreSQLResultRow!.toColumnMap()[filedName];
     }
     throw StateError("No query result defined.");
   }
 
   dynamic getAt(int index) {
     if (sqliteResultSetRow != null) {
-      return sqliteResultSetRow.columnAt(index);
+      return sqliteResultSetRow!.columnAt(index);
     } else if (postgreSQLResultRow != null) {
-      return postgreSQLResultRow[index];
+      return postgreSQLResultRow![index];
     }
     throw StateError("No query result defined.");
   }
@@ -323,12 +323,12 @@ class QueryResultRow {
   /// Run a function taking a a key and its value on the whole [QueryResultRow].
   void forEach(Function keyValueFunction) {
     if (sqliteResultSetRow != null) {
-      sqliteResultSetRow.forEach((key, value) {
+      sqliteResultSetRow!.forEach((key, value) {
         keyValueFunction(key, value);
       });
       return;
     } else if (postgreSQLResultRow != null) {
-      postgreSQLResultRow.toColumnMap().forEach((key, value) {
+      postgreSQLResultRow!.toColumnMap().forEach((key, value) {
         keyValueFunction(key, value);
       });
       return;

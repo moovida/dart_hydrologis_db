@@ -99,7 +99,7 @@ class DbsUtilities {
       // already fixed
       return name;
     }
-    double num = double.tryParse(name.substring(0, 1));
+    double? num = double.tryParse(name.substring(0, 1));
 
     if (num != null ||
         name.contains("-") ||
@@ -119,7 +119,7 @@ class DbsUtilities {
       // already fixed
       return name;
     }
-    double num = double.tryParse(name.substring(0, 1));
+    double? num = double.tryParse(name.substring(0, 1));
 
     if (num != null ||
         name.contains("-") ||
@@ -139,7 +139,7 @@ class DbsUtilities {
       // already fixed
       return name;
     }
-    double num = double.tryParse(name.substring(0, 1));
+    double? num = double.tryParse(name.substring(0, 1));
 
     if (num != null ||
         name.contains("-") ||

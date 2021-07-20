@@ -6,8 +6,8 @@ part of dart_hydrologis_db;
 class SLogger {
   static final SLogger _instance = SLogger._internal();
 
-  LogDb _logDb;
-  String _folder;
+  LogDb? _logDb;
+  String? _folder;
 
   bool doConsoleLogging = true;
 
@@ -16,22 +16,22 @@ class SLogger {
   SLogger._internal();
 
   /// Initialize database logging. Without this call, everything goes just to standard out.
-  bool init(String folder) {
+  bool? init(String folder) {
     _folder = folder;
     i("Initializing SLogger with folder: $_folder");
 
     _logDb = LogDb();
-    return _logDb.init(_folder);
+    return _logDb?.init(_folder!);
   }
 
   /// Delete all the log db content.
   void clearLog() {
-    _logDb._db.execute("delete from ${LogDb.TABLE_NAME};");
+    _logDb?._db.execute("delete from ${LogDb.TABLE_NAME};");
   }
 
-  String get folder => _folder;
+  String? get folder => _folder;
 
-  String get dbPath => _logDb?.path;
+  String? get dbPath => _logDb?.path;
 
   void v(dynamic message) {
     _logDb?.put(Level.verbose, message);
@@ -69,7 +69,7 @@ class SLogger {
     }
   }
 
-  void e(dynamic message, Exception e, StackTrace stackTrace) {
+  void e(dynamic message, Exception? e, StackTrace? stackTrace) {
     _logDb?.put(Level.error, message);
     if (e != null) {
       _logDb?.put(Level.error, "Exception: $e");
@@ -91,8 +91,8 @@ class SLogger {
   }
 
   /// Get the current list of log items.
-  List<GpLogItem> getLogItems({int limit}) {
-    return _logDb.getLogItems(limit: limit);
+  List<GpLogItem>? getLogItems({int? limit}) {
+    return _logDb?.getLogItems(limit: limit);
   }
 }
 
@@ -138,8 +138,8 @@ class GpLogItemQueryBuilder extends QueryObjectBuilder<GpLogItem> {
 }
 
 class GpLogItem {
-  String level;
-  String message;
+  String? level;
+  String? message;
   int ts = DateTime.now().millisecondsSinceEpoch;
 
   Map<String, dynamic> toMap() {
@@ -168,10 +168,10 @@ class LogDb {
     );"
   ''';
 
-  SqliteDb _db;
-  String _dbPath;
+  late SqliteDb _db;
+  late String _dbPath;
 
-  List<GpLogItem> getLogItems({int limit}) {
+  List<GpLogItem> getLogItems({int? limit}) {
     var queryObj = GpLogItemQueryBuilder();
     if (limit != null) {
       queryObj.limit = limit;
@@ -213,6 +213,6 @@ class LogDb {
     var item = GpLogItem()
       ..level = level.toString()
       ..message = message;
-    _db?.insertMap(SqlName(TABLE_NAME), item.toMap());
+    _db.insertMap(SqlName(TABLE_NAME), item.toMap());
   }
 }

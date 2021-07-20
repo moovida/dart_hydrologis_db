@@ -4,11 +4,11 @@ part of dart_hydrologis_db;
 class PostgresqlDb extends ADbAsync {
   final String _host;
   final String _dbName;
-  String user;
-  String pwd;
+  String? user;
+  String? pwd;
   int port;
   bool _isClosed = false;
-  PostgreSQLConnection _db;
+  PostgreSQLConnection? _db;
 
   PostgresqlDb(
     this._host,
@@ -19,14 +19,14 @@ class PostgresqlDb extends ADbAsync {
   });
 
   @override
-  Future<bool> open({Function populateFunction}) async {
+  Future<bool> open({Function? populateFunction}) async {
     try {
       if (_db != null) {
         throw StateError("Database already opened.");
       }
       _db = PostgreSQLConnection(_host, port, _dbName,
           username: user, password: pwd);
-      await _db.open();
+      await _db?.open();
 
       if (populateFunction != null) {
         await populateFunction(this);
@@ -42,7 +42,7 @@ class PostgresqlDb extends ADbAsync {
 
   @override
   bool isOpen() {
-    if (_db == null || _db.isClosed) return false;
+    if (_db == null || _db!.isClosed) return false;
     return !_isClosed;
   }
 
@@ -50,20 +50,19 @@ class PostgresqlDb extends ADbAsync {
   Future<void> close() async {
     _isClosed = true;
     return await _db?.close();
-    // return _db?.close();
   }
 
   /// This should only be used when a custom function is necessary,
   /// which forces to use the method from the moor database.
-  PostgreSQLConnection getInternalDb() {
+  PostgreSQLConnection? getInternalDb() {
     return _db;
   }
 
   @override
-  Future<int> execute(String sqlToExecute,
-      {List<dynamic> arguments, bool getLastInsertId = false}) async {
+  Future<int?> execute(String sqlToExecute,
+      {List<dynamic>? arguments, bool getLastInsertId = false}) async {
     int count = 1;
-    Map<String, dynamic> paramsMap;
+    Map<String, dynamic>? paramsMap;
     if (arguments != null) {
       paramsMap = {};
       for (var arg in arguments) {
@@ -74,9 +73,9 @@ class PostgresqlDb extends ADbAsync {
       }
     }
 
-    PostgreSQLResult sqlResult;
+    PostgreSQLResult? sqlResult;
     try {
-      sqlResult = await _db.query(sqlToExecute, substitutionValues: paramsMap);
+      sqlResult = await _db?.query(sqlToExecute, substitutionValues: paramsMap);
       if (getLastInsertId) {
         throw Exception("Not implemented");
         // return _db.lastInsertRowId;
@@ -86,7 +85,7 @@ class PostgresqlDb extends ADbAsync {
         // final res = await yourConnection.query('INSERT INTO $tableName ($keys) VALUES ($values) RETURNING $primaryKeyName;');
         // final lastInsertedId = res.last[0] as int;
       } else {
-        return sqlResult.affectedRowCount;
+        return sqlResult?.affectedRowCount;
       }
     } on Exception catch (e, s) {
       SLogger().e("Execute error.", e, s);
@@ -95,9 +94,9 @@ class PostgresqlDb extends ADbAsync {
   }
 
   @override
-  Future<QueryResult> select(String sql, [List<dynamic> arguments]) async {
+  Future<QueryResult?> select(String sql, [List<dynamic>? arguments]) async {
     int count = 1;
-    Map<String, dynamic> paramsMap;
+    Map<String, dynamic>? paramsMap;
     if (arguments != null) {
       paramsMap = {};
       for (var arg in arguments) {
@@ -108,7 +107,7 @@ class PostgresqlDb extends ADbAsync {
       }
     }
     try {
-      var sqlResult = await _db.query(sql, substitutionValues: paramsMap);
+      var sqlResult = await _db?.query(sql, substitutionValues: paramsMap);
       return QueryResult.fromPostgresqlResult(sqlResult);
     } on Exception catch (ex, s) {
       SLogger().e("Execute error.", ex, s);
@@ -117,7 +116,7 @@ class PostgresqlDb extends ADbAsync {
   }
 
   @override
-  Future<int> insertMap(SqlName table, Map<String, dynamic> values) async {
+  Future<int?> insertMap(SqlName table, Map<String, dynamic> values) async {
     List<dynamic> args = [];
     var keys;
     var questions;
@@ -141,13 +140,13 @@ class PostgresqlDb extends ADbAsync {
     if (values.containsKey(pkName)) {
       sql = "select max($pkName) from ${table.fixedDoubleName}";
       var queryResult = await select(sql);
-      maxPk = queryResult.first.getAt(0);
+      maxPk = queryResult?.first.getAt(0);
     }
     return maxPk;
   }
 
   @override
-  Future<int> updateMap(
+  Future<int?> updateMap(
       SqlName table, Map<String, dynamic> values, String where) async {
     List<dynamic> args = [];
     var keysVal;
@@ -181,7 +180,7 @@ class PostgresqlDb extends ADbAsync {
         and table_name != 'raster_overviews'
         $orderBy;""";
     var res = await select(sql);
-    res.forEach((QueryResultRow row) {
+    res?.forEach((QueryResultRow row) {
       var name = row.get('table_name');
       tableNames.add(SqlName(name));
     });
@@ -217,7 +216,7 @@ class PostgresqlDb extends ADbAsync {
     List<List<dynamic>> columnsList = [];
 
     var res = await select(sql, [tableName.name]);
-    res.forEach((QueryResultRow row) {
+    res?.forEach((QueryResultRow row) {
       String colName = row.get('column_name');
       String colType = row.get('data_type');
       int isPk = 0;
@@ -225,24 +224,24 @@ class PostgresqlDb extends ADbAsync {
         isPk = 1;
       }
       // TODO check
-      int notNull; //row['notnull'];
+      int? notNull; //row['notnull'];
       columnsList.add([colName, colType, isPk, notNull]);
     });
     return columnsList;
   }
 
   @override
-  Future<String> getPrimaryKey(SqlName tableName) async {
+  Future<String?> getPrimaryKey(SqlName tableName) async {
     var queryResult = await select(getIndexSql(tableName));
-    if (queryResult.length == 0) {
+    if (queryResult?.length == 0) {
       return null;
     }
-    var queryResultRow = queryResult.first;
-    String pkName;
-    String indexName = queryResultRow.get("index_name").toString();
-    if (indexName.toLowerCase().contains("pkey")) {
-      String columnDef = queryResultRow.get("column").toString();
-      pkName = columnDef.split(RegExp(r"\s+"))[0];
+    var queryResultRow = queryResult?.first;
+    String? pkName;
+    String? indexName = queryResultRow?.get("index_name").toString();
+    if (indexName != null && indexName.toLowerCase().contains("pkey")) {
+      String? columnDef = queryResultRow?.get("column").toString();
+      pkName = columnDef?.split(RegExp(r"\s+"))[0];
     }
     return pkName;
   }
@@ -266,7 +265,8 @@ class PostgresqlDb extends ADbAsync {
   }
 
   @override
-  Future<dynamic> transaction(Function transactionOperations) async {
-    return await _db.transaction(transactionOperations);
+  Future<dynamic>? transaction(Function transactionOperations) async {
+    return await _db?.transaction(transactionOperations as Future Function(
+        PostgreSQLExecutionContext connection));
   }
 }

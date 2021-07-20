@@ -36,10 +36,10 @@ class MBTilesDb {
   static const CREATE_TILES =
       "CREATE TABLE $TABLE_TILES ($COL_TILES_ZOOM_LEVEL INTEGER, $COL_TILES_TILE_COLUMN INTEGER, $COL_TILES_TILE_ROW INTEGER, $COL_TILES_TILE_DATA BLOB)";
 
-  SqliteDb database;
-  String databasePath;
+  late SqliteDb database;
+  late String _databasePath;
 
-  Map<String, String> metadataMap;
+  Map<String, String?>? metadataMap;
 
   String tileRowType = "osm"; // could be tms in some cases
 
@@ -47,11 +47,11 @@ class MBTilesDb {
   ///
   /// @param database the [SqliteDb] database.
   MBTilesDb(String databasePath) {
-    this.databasePath = databasePath;
+    _databasePath = databasePath;
   }
 
   void open() {
-    database = SqliteDb(databasePath);
+    database = SqliteDb(_databasePath);
 
     database.open(populateFunction: (SqliteDb db) {
       if (!db.hasTable(SqlName(TABLE_TILES))) {
@@ -154,7 +154,7 @@ class MBTilesDb {
   /// @param zoom the zoom level.
   /// @return the tile image bytes.
   /// @throws Exception
-  List<int> getTile(int tx, int tyOsm, int zoom) {
+  List<int>? getTile(int tx, int tyOsm, int zoom) {
     int ty = tyOsm;
     if (tileRowType == "tms") {
       var tmsTileXY = osmTile2TmsTile(tx, tyOsm, zoom);
@@ -183,7 +183,7 @@ class MBTilesDb {
   /// @return the array [w, e, s, n] of the dataset.
   List<double> getBounds() {
     checkMetadata();
-    String boundsWSEN = metadataMap["bounds"];
+    String? boundsWSEN = metadataMap?["bounds"];
     if (boundsWSEN == null) {
       return [-180, 180, -90, 90];
     }
@@ -289,14 +289,14 @@ class MBTilesDb {
 
       var res = database.select(SELECT_METADATA);
       res.forEach((QueryResultRow row) {
-        metadataMap[row.get(COL_METADATA_NAME).toLowerCase()] =
+        metadataMap![row.get(COL_METADATA_NAME).toLowerCase()] =
             row.get(COL_METADATA_VALUE);
       });
     }
   }
 
   void close() {
-    database?.close();
+    database.close();
   }
 
   ///**

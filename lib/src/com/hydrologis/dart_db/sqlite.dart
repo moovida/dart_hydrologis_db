@@ -2,8 +2,8 @@ part of dart_hydrologis_db;
 
 /// The Sqlite database used for project and datasets as mbtiles.
 class SqliteDb extends ADb {
-  Database _db;
-  String _dbPath;
+  Database? _db;
+  String? _dbPath;
   bool _isClosed = false;
 
   SqliteDb(this._dbPath);
@@ -18,16 +18,16 @@ class SqliteDb extends ADb {
   }
 
   @override
-  void open({Function populateFunction}) {
+  void open({Function? populateFunction}) {
     bool existsAlready;
     if (_dbPath == null) {
       _db = sqlite3.openInMemory();
       // _db = Database.memory();
       existsAlready = false;
     } else {
-      var dbFile = File(_dbPath);
+      var dbFile = File(_dbPath!);
       existsAlready = dbFile.existsSync();
-      _db = sqlite3.open(_dbPath);
+      _db = sqlite3.open(_dbPath!);
       // _db = Database.openFile(dbFile);
     }
     if (!existsAlready && populateFunction != null) {
@@ -37,7 +37,7 @@ class SqliteDb extends ADb {
   }
 
   /// Get the database path.
-  String get path => _dbPath;
+  String? get path => _dbPath;
 
   @override
   bool isOpen() {
@@ -54,23 +54,28 @@ class SqliteDb extends ADb {
 
   /// This should only be used when a custom function is necessary,
   /// which forces to use the method from the moor database.
-  Database getInternalDb() {
+  Database? getInternalDb() {
     return _db;
   }
 
   @override
-  int execute(String sqlToExecute,
-      {List<dynamic> arguments, bool getLastInsertId = false}) {
-    PreparedStatement stmt;
+  int? execute(String sqlToExecute,
+      {List<dynamic>? arguments, bool getLastInsertId = false}) {
+    PreparedStatement? stmt;
     try {
-      stmt = _db.prepare(sqlToExecute);
-      stmt.execute(arguments);
+      stmt = _db?.prepare(sqlToExecute);
+
+      List<Object?> args = [];
+      arguments?.forEach((element) {
+        args.add(element);
+      });
+      stmt?.execute(args);
 
       if (getLastInsertId) {
-        return _db.lastInsertRowId;
+        return _db?.lastInsertRowId;
         // return _db.getLastInsertId();
       } else {
-        return _db.getUpdatedRows();
+        return _db?.getUpdatedRows();
       }
     } finally {
       stmt?.dispose();
@@ -79,11 +84,15 @@ class SqliteDb extends ADb {
   }
 
   @override
-  QueryResult select(String sql, [List<dynamic> arguments]) {
-    PreparedStatement selectStmt;
+  QueryResult select(String sql, [List<dynamic>? arguments]) {
+    PreparedStatement? selectStmt;
     try {
-      selectStmt = _db.prepare(sql);
-      final ResultSet result = selectStmt.select(arguments);
+      selectStmt = _db?.prepare(sql);
+      List<Object?> args = [];
+      arguments?.forEach((element) {
+        args.add(element);
+      });
+      final ResultSet? result = selectStmt?.select(args);
       return QueryResult.fromResultSet(result);
     } finally {
       selectStmt?.dispose();
@@ -142,7 +151,7 @@ class SqliteDb extends ADb {
   }
 
   @override
-  String getPrimaryKey(SqlName tableName) {
+  String? getPrimaryKey(SqlName tableName) {
     String sql = "PRAGMA table_info(${tableName.fixedName})";
     var res = select(sql);
     var resultRow = res.find("pk", 1);
@@ -168,13 +177,13 @@ class SqliteDb extends ADb {
   /// be used in VIEWs or TRIGGERs nor in schema structures (such as CHECK,
   /// DEFAULT, etc.).
   void createFunction({
-    String functionName,
-    ScalarFunction function,
-    int argumentCount,
+    required String functionName,
+    required ScalarFunction function,
+    required int argumentCount,
     bool deterministic = false,
     bool directOnly = true,
   }) {
-    _db.createFunction(
+    _db?.createFunction(
       functionName: functionName,
       argumentCount: AllowedArgumentCount(argumentCount),
       deterministic: deterministic,

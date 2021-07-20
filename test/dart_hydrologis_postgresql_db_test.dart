@@ -2,7 +2,7 @@ import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
 import 'package:test/test.dart';
 
 void main() {
-  PostgresqlDb db;
+  late PostgresqlDb db;
 
   setUpAll(() {
     db = PostgresqlDb(
@@ -31,7 +31,7 @@ void main() {
   test('test select', () async {
     var select =
         await db.select("select * from ${t1Name.fixedDoubleName} order by id");
-    var row = select.first;
+    var row = select!.first;
 
     expect(row.get('id'), 1);
     expect(row.get('name'), 'Tscherms');
@@ -50,14 +50,14 @@ void main() {
 
     var select =
         await db.select("select * from ${t1Name.fixedDoubleName} where id=4");
-    var row = select.first;
+    var row = select!.first;
     expect(row.get('id'), 4);
     expect(row.get('name'), 'Egna');
     expect(row.get('temperature'), 27.0);
 
     select =
         await db.select("select * from ${t1Name.fixedDoubleName} where id=5");
-    row = select.first;
+    row = select!.first;
     expect(row.get('id'), 5);
     expect(row.get('name'), 'Trento');
     expect(row.get('temperature'), 18.0);
@@ -69,7 +69,7 @@ void main() {
 
     var select =
         await db.select("select * from ${t1Name.fixedDoubleName} where id=3");
-    var row = select.first;
+    var row = select!.first;
     expect(row.get('id'), 3);
     expect(row.get('name'), 'Egna');
     expect(row.get('temperature'), 27.0);
@@ -82,7 +82,7 @@ void main() {
 
     select =
         await db.select("select * from ${t1Name.fixedDoubleName} where id=3");
-    row = select.first;
+    row = select!.first;
     expect(row.get('id'), 3);
     expect(row.get('name'), 'Trento');
     expect(row.get('temperature'), 18.0);
@@ -276,9 +276,9 @@ var insertTable3 = [
 ];
 
 class Table1Obj {
-  int id;
-  String name;
-  double temperature;
+  late int id;
+  late String name;
+  late double temperature;
 }
 
 class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {

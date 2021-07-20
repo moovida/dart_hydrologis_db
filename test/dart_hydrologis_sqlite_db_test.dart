@@ -52,9 +52,9 @@ var insertTable3 = [
 ];
 
 class Table1Obj {
-  int id;
-  String name;
-  double temperature;
+  late int id;
+  late String name;
+  late double temperature;
 }
 
 class Table1ObjBuilder implements QueryObjectBuilder<Table1Obj> {
