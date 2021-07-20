@@ -33,7 +33,9 @@ class PostgresqlDb extends ADbAsync {
       }
       return true;
     } on Exception {
-      return false;
+      _db = null;
+      rethrow;
+      // return false;
     }
   }
 
