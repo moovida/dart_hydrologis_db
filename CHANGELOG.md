@@ -1,3 +1,8 @@
+## 0.7.0
+
+- libraries upgrade
+- migrate to null safety
+
 ## 0.6.2
 
 - fix for mbtiles metadata reading bug.
