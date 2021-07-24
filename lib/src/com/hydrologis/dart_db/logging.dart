@@ -26,7 +26,7 @@ class SLogger {
 
   /// Delete all the log db content.
   void clearLog() {
-    _logDb?._db.execute("delete from ${LogDb.TABLE_NAME};");
+    _logDb?._db?.execute("delete from ${LogDb.TABLE_NAME};");
   }
 
   String? get folder => _folder;
@@ -168,15 +168,15 @@ class LogDb {
     );"
   ''';
 
-  late SqliteDb _db;
+  SqliteDb? _db;
   late String _dbPath;
 
-  List<GpLogItem> getLogItems({int? limit}) {
+  List<GpLogItem>? getLogItems({int? limit}) {
     var queryObj = GpLogItemQueryBuilder();
     if (limit != null) {
       queryObj.limit = limit;
     }
-    List<GpLogItem> result = _db.getQueryObjectsList(queryObj);
+    List<GpLogItem>? result = _db?.getQueryObjectsList(queryObj);
     return result;
   }
 
@@ -185,7 +185,7 @@ class LogDb {
       SLogger().i("Init LogDb with folder: $folder and app name: $DB_NAME");
       _dbPath = joinPaths(folder, DB_NAME);
       _db = SqliteDb(_dbPath);
-      _db.open(populateFunction: createLogDatabase);
+      _db!.open(populateFunction: createLogDatabase);
     } on Exception catch (e, s) {
       SLogger().e("Error initializing LogDb", e, s);
       return false;
@@ -213,6 +213,6 @@ class LogDb {
     var item = GpLogItem()
       ..level = level.toString()
       ..message = message;
-    _db.insertMap(SqlName(TABLE_NAME), item.toMap());
+    _db?.insertMap(SqlName(TABLE_NAME), item.toMap());
   }
 }
