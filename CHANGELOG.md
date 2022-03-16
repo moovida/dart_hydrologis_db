@@ -1,3 +1,6 @@
+## 0.7.1
+
+- added conditional imports to work on web without the sqlite3 part.
 ## 0.7.0
 
 - libraries upgrade
