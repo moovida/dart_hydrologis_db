@@ -12,7 +12,6 @@ class SqliteDb extends ADb {
     _dbPath = null;
   }
 
-  @override
   bool isAsync() {
     return false;
   }
@@ -60,7 +59,9 @@ class SqliteDb extends ADb {
 
   @override
   int? execute(String sqlToExecute,
-      {List<dynamic>? arguments, bool getLastInsertId = false}) {
+      {List<dynamic>? arguments,
+      bool getLastInsertId = false,
+      String? primaryKey}) {
     PreparedStatement? stmt;
     try {
       stmt = _db?.prepare(sqlToExecute);

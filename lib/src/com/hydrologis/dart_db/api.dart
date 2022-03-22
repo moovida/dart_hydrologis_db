@@ -60,9 +60,12 @@ abstract class ADb {
   /// or prepared mode using [arguments].
   ///
   /// This returns the number of affected rows. Only if [getLastInsertId]
-  /// is set to true, the id of the last inserted row is returned.
+  /// is set to true, the id of the last inserted row is returned. The [primaryKey]
+  /// is sometimes necessary to retrieve the last inserted id.
   int? execute(String sqlToExecute,
-      {List<dynamic> arguments, bool getLastInsertId = false});
+      {List<dynamic> arguments,
+      bool getLastInsertId = false,
+      String? primaryKey});
 
   /// The standard query method.
   QueryResult select(String sql, [List<dynamic> arguments]);
@@ -85,8 +88,9 @@ abstract class ADb {
       args.add(value);
     });
 
+    var pk = getPrimaryKey(table);
     var sql = "insert into ${table.fixedName} ( $keys ) values ( $questions );";
-    return execute(sql, arguments: args, getLastInsertId: true);
+    return execute(sql, arguments: args, getLastInsertId: true, primaryKey: pk);
   }
 
   /// Update a new record using a map and a where condition.
@@ -171,9 +175,12 @@ abstract class ADbAsync {
   /// or prepared mode using [arguments].
   ///
   /// This returns the number of affected rows. Only if [getLastInsertId]
-  /// is set to true, the id of the last inserted row is returned.
+  /// is set to true, the id of the last inserted row is returned. The [primaryKey]
+  /// is sometimes necessary to retrieve the last inserted id.
   Future<int?> execute(String sqlToExecute,
-      {List<dynamic> arguments, bool getLastInsertId = false});
+      {List<dynamic> arguments,
+      bool getLastInsertId = false,
+      String? primaryKey});
 
   /// The standard query method.
   Future<QueryResult?> select(String sql, [List<dynamic> arguments]);
@@ -196,8 +203,10 @@ abstract class ADbAsync {
       args.add(value);
     });
 
+    var pk = await getPrimaryKey(table);
     var sql = "insert into ${table.fixedName} ( $keys ) values ( $questions );";
-    return await execute(sql, arguments: args, getLastInsertId: true);
+    return await execute(sql,
+        arguments: args, getLastInsertId: true, primaryKey: pk);
   }
 
   /// Update a new record using a map and a where condition.

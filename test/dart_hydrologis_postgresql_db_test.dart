@@ -10,7 +10,7 @@ void main() {
       "test",
       port: 5432,
       user: "postgres",
-      // pwd: "postgres",
+      pwd: "postgres",
     );
     return db.open(populateFunction: createDbFunction);
   });
@@ -62,6 +62,36 @@ void main() {
     expect(row.get('name'), 'Trento');
     expect(row.get('temperature'), 18.0);
   });
+
+  test('test insert with return', () async {
+    var pk = await db.getPrimaryKey(t1Name);
+    var sql = "INSERT INTO ${t1Name.fixedDoubleName} VALUES(44, 'Egna', 27.0);";
+    var lastId = await db.execute(sql, getLastInsertId: true, primaryKey: pk);
+    expect(lastId, 44);
+
+    var map = {
+      'id': 55,
+      'name': 'Trento',
+      'temperature': 18.0,
+    };
+    var lastId2 = await db.insertMap(t1Name, map);
+    expect(lastId2, 55);
+
+    var select =
+        await db.select("select * from ${t1Name.fixedDoubleName} where id=44");
+    var row = select!.first;
+    expect(row.get('id'), 44);
+    expect(row.get('name'), 'Egna');
+    expect(row.get('temperature'), 27.0);
+
+    select =
+        await db.select("select * from ${t1Name.fixedDoubleName} where id=55");
+    row = select!.first;
+    expect(row.get('id'), 55);
+    expect(row.get('name'), 'Trento');
+    expect(row.get('temperature'), 18.0);
+  });
+
   test('test update', () async {
     var sql =
         "UPDATE  ${t1Name.fixedDoubleName} set name='Egna', temperature=27.0 where id=3;";

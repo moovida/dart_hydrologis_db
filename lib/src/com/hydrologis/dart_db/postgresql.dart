@@ -62,7 +62,9 @@ class PostgresqlDb extends ADbAsync {
 
   @override
   Future<int?> execute(String sqlToExecute,
-      {List<dynamic>? arguments, bool getLastInsertId = false}) async {
+      {List<dynamic>? arguments,
+      bool getLastInsertId = false,
+      String? primaryKey}) async {
     int count = 1;
     Map<String, dynamic>? paramsMap;
     if (arguments != null) {
@@ -77,9 +79,14 @@ class PostgresqlDb extends ADbAsync {
 
     PostgreSQLResult? sqlResult;
     try {
-      sqlResult = await _db?.query(sqlToExecute, substitutionValues: paramsMap);
       if (getLastInsertId) {
-        throw Exception("Not implemented");
+        if (sqlToExecute.trimRight().endsWith(";")) {
+          sqlToExecute = sqlToExecute.substring(0, sqlToExecute.length - 1);
+        }
+        var finalSql = "$sqlToExecute RETURNING $primaryKey";
+        sqlResult = await _db?.query(finalSql, substitutionValues: paramsMap);
+        return sqlResult?.last[0] as int;
+        // throw Exception("Not implemented");
         // return _db.lastInsertRowId;
 
         // TODO this is now supported as
@@ -87,6 +94,8 @@ class PostgresqlDb extends ADbAsync {
         // final res = await yourConnection.query('INSERT INTO $tableName ($keys) VALUES ($values) RETURNING $primaryKeyName;');
         // final lastInsertedId = res.last[0] as int;
       } else {
+        sqlResult =
+            await _db?.query(sqlToExecute, substitutionValues: paramsMap);
         return sqlResult?.affectedRowCount;
       }
     } on Exception catch (e, s) {
