@@ -1,3 +1,7 @@
+## 0.7.2
+
+- added returning of generated ids also for postgres.
+
 ## 0.7.1
 
 - added conditional imports to work on web without the sqlite3 part.
