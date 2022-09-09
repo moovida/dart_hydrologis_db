@@ -1,3 +1,7 @@
+## 0.7.3
+
+- major sqlite upgrade.
+
 ## 0.7.2
 
 - added returning of generated ids also for postgres.
