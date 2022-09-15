@@ -1,3 +1,8 @@
+## 0.7.
+
+- postgres libs upgrade
+- added more options for db open
+
 ## 0.7.3
 
 - major sqlite upgrade.
