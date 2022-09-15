@@ -1,4 +1,4 @@
-## 0.7.
+## 0.7.4
 
 - postgres libs upgrade
 - added more options for db open
