@@ -19,13 +19,32 @@ class PostgresqlDb extends ADbAsync {
   });
 
   @override
-  Future<bool> open({Function? populateFunction}) async {
+  Future<bool> open({
+    Function? populateFunction,
+    int timeoutInSeconds = 30,
+    int queryTimeoutInSeconds = 30,
+    String timeZone = 'UTC',
+    bool useSSL = false,
+    bool isUnixSocket = false,
+    bool allowClearTextPassword = false,
+  }) async {
     try {
       if (_db != null) {
         throw StateError("Database already opened.");
       }
-      _db = PostgreSQLConnection(_host, port, _dbName,
-          username: user, password: pwd);
+      _db = PostgreSQLConnection(
+        _host,
+        port,
+        _dbName,
+        username: user,
+        password: pwd,
+        timeoutInSeconds: timeoutInSeconds,
+        queryTimeoutInSeconds: queryTimeoutInSeconds,
+        timeZone: timeZone,
+        useSSL: useSSL,
+        isUnixSocket: isUnixSocket,
+        allowClearTextPassword: allowClearTextPassword,
+      );
       await _db?.open();
 
       if (populateFunction != null) {

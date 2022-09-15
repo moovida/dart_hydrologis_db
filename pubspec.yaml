@@ -14,7 +14,7 @@ dependencies:
  sqlite3: ^1.8.0
 
  # BSD 
- postgres: ^2.4.6
+ postgres: ^2.5.1
 
  # BSD
  stack_trace: ^1.10.0
