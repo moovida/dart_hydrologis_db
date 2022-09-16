@@ -54,7 +54,7 @@ class MBTilesDb {
     database = SqliteDb(_databasePath);
 
     database.open(populateFunction: (SqliteDb db) {
-      if (!db.hasTable(SqlName(TABLE_TILES))) {
+      if (!db.hasTable(TableName(TABLE_TILES))) {
         db.execute(CREATE_TILES);
         db.execute(CREATE_METADATA);
         db.execute(INDEX_TILES);

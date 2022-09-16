@@ -7,9 +7,9 @@ ADb createDb(Function onCreateFunction) {
   return db;
 }
 
-var t1Name = SqlName("table 1");
-var t2Name = SqlName("table2");
-var t3Name = SqlName("10table with,nasty");
+var t1Name = TableName("table 1", schemaSupported: false);
+var t2Name = TableName("table2", schemaSupported: false);
+var t3Name = TableName("10table with,nasty", schemaSupported: false);
 var col1Name = SqlName("10col with,nasty");
 
 var createTable1 = '''

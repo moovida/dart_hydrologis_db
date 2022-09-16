@@ -155,25 +155,84 @@ class DbsUtilities {
 ///
 /// This will contain the original name,the fixed one and the one between square brackets.
 class SqlName {
-  final String name;
+  late String name;
 
   /// The name fixed by quoting, if necessary.
   ///
   /// This might be needed for strange table names.
-  final String fixedName;
+  late String fixedName;
 
   /// The name fixed by double quoting, if necessary.
   ///
   /// This might be needed for strange table names in some cases (ex. create table on postgresql).
-  final String fixedDoubleName;
+  late String fixedDoubleName;
 
   /// The name fixed by surrounding with square brackets, if necessary.
   ///
   /// This might be needed for example in select queries for strange column names.
-  final String bracketName;
+  late String bracketName;
 
-  SqlName(this.name)
-      : fixedName = DbsUtilities.fixWithQuotes(name),
-        bracketName = DbsUtilities.fixWithBrackets(name),
-        fixedDoubleName = DbsUtilities.fixWithDoubleQuotes(name);
+  SqlName(this.name) {
+    fixedName = DbsUtilities.fixWithQuotes(name);
+    bracketName = DbsUtilities.fixWithBrackets(name);
+    fixedDoubleName = DbsUtilities.fixWithDoubleQuotes(name);
+  }
+}
+
+/// A name for sql related strings (table names and column names ex.).
+///
+/// This will contain the original name,the fixed one and the one between square brackets.
+class TableName {
+  late String name;
+
+  /// The name fixed by quoting, if necessary.
+  ///
+  /// This might be needed for strange table names.
+  late String fixedName;
+
+  /// The name fixed by double quoting, if necessary.
+  ///
+  /// This might be needed for strange table names in some cases (ex. create table on postgresql).
+  late String fixedDoubleName;
+
+  /// The name fixed by surrounding with square brackets, if necessary.
+  ///
+  /// This might be needed for example in select queries for strange column names.
+  late String bracketName;
+
+  String? _schema = "public";
+
+  /// Create a [TableName]. If schemas are not supported , set [schemaSupported] to false].
+  TableName(this.name, {bool schemaSupported = true}) {
+    if (schemaSupported) {
+      if (name.contains(".")) {
+        var split = name.split(".");
+        name = split[1];
+        _schema = split[0];
+      }
+    } else {
+      _schema = null;
+    }
+
+    if (_schema != null) {
+      fixedName = _schema! + "." + DbsUtilities.fixWithQuotes(name);
+      bracketName = _schema! + "." + DbsUtilities.fixWithBrackets(name);
+      fixedDoubleName = _schema! + "." + DbsUtilities.fixWithDoubleQuotes(name);
+    } else {
+      fixedName = DbsUtilities.fixWithQuotes(name);
+      bracketName = DbsUtilities.fixWithBrackets(name);
+      fixedDoubleName = DbsUtilities.fixWithDoubleQuotes(name);
+    }
+  }
+
+  bool hasSchema() {
+    return _schema != null;
+  }
+
+  /// Returns the schema.
+  ///
+  /// This throws an exception if called when schemas are not supported.
+  String getSchema() {
+    return _schema!;
+  }
 }

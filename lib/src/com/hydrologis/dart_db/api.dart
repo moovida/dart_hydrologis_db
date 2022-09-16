@@ -16,28 +16,31 @@ abstract class ADb {
   /// Close the database.
   void close();
 
+  /// Get the list of user created schemas, if necessary [doOrder].
+  List<String> getSchemas({bool doOrder = false});
+
   /// Get the list of table names, if necessary [doOrder].
-  List<SqlName> getTables({bool doOrder = false});
+  List<TableName> getTables({bool doOrder = false});
 
   /// Check is a given [tableName] exists.
-  bool hasTable(SqlName tableName);
+  bool hasTable(TableName tableName);
 
   /// Get the [tableName] columns as array of:
   ///   - name (string),
   ///   - type (string),
   ///   - isPrimaryKey (int, 1 for true)
   ///   - notnull (int).
-  List<List<dynamic>> getTableColumns(SqlName tableName);
+  List<List<dynamic>> getTableColumns(TableName tableName);
 
   /// Get the primary key from a non spatial db.
-  String? getPrimaryKey(SqlName tableName);
+  String? getPrimaryKey(TableName tableName);
 
   /// Get a list of items defined by the [queryObj].
   ///
   /// Optionally a custom [whereString] piece can be passed in.
   /// It can start with the keyword where.
   List<T> getQueryObjectsList<T>(QueryObjectBuilder<T> queryObj,
-      {String whereString = ""}) {
+      {String? whereString}) {
     String querySql = "${queryObj.querySql()}";
     if (whereString != null && whereString.isNotEmpty) {
       if (whereString.trim().toLowerCase().startsWith("where")) {
@@ -73,7 +76,7 @@ abstract class ADb {
   /// Insert a new record using a map [values] into a given [table].
   ///
   /// This returns the id of the inserted row.
-  int? insertMap(SqlName table, Map<String, dynamic> values) {
+  int? insertMap(TableName table, Map<String, dynamic> values) {
     List<dynamic> args = [];
     var keys;
     var questions;
@@ -96,7 +99,7 @@ abstract class ADb {
   /// Update a new record using a map and a where condition.
   ///
   /// This returns the number of rows affected.
-  int? updateMap(SqlName table, Map<String, dynamic> values, String where) {
+  int? updateMap(TableName table, Map<String, dynamic> values, String where) {
     List<dynamic> args = [];
     var keysVal;
     values.forEach((key, value) {
@@ -136,21 +139,24 @@ abstract class ADbAsync {
   /// Close the database.
   Future<void> close();
 
+  /// Get the list of user created schemas, if necessary [doOrder].
+  Future<List<SqlName>> getSchemas({bool doOrder = false});
+
   /// Get the list of table names, if necessary [doOrder].
-  Future<List<SqlName>> getTables({bool doOrder = false});
+  Future<List<TableName>> getTables({bool doOrder = false});
 
   /// Check is a given [tableName] exists.
-  Future<bool> hasTable(SqlName tableName);
+  Future<bool> hasTable(TableName tableName);
 
   /// Get the [tableName] columns as array of:
   ///   - name (string),
   ///   - type (string),
   ///   - isPrimaryKey (int, 1 for true)
   ///   - notnull (int).
-  Future<List<List<dynamic>>> getTableColumns(SqlName tableName);
+  Future<List<List<dynamic>>> getTableColumns(TableName tableName);
 
   /// Get the primary key for a given table.
-  Future<String?> getPrimaryKey(SqlName tableName);
+  Future<String?> getPrimaryKey(TableName tableName);
 
   /// Get a list of items defined by the [queryObj].
   ///
@@ -188,7 +194,7 @@ abstract class ADbAsync {
   /// Insert a new record using a map [values] into a given [table].
   ///
   /// This returns the id of the inserted row.
-  Future<int?> insertMap(SqlName table, Map<String, dynamic> values) async {
+  Future<int?> insertMap(TableName table, Map<String, dynamic> values) async {
     List<dynamic> args = [];
     var keys;
     var questions;
@@ -213,7 +219,7 @@ abstract class ADbAsync {
   ///
   /// This returns the number of rows affected.
   Future<int?> updateMap(
-      SqlName table, Map<String, dynamic> values, String where) async {
+      TableName table, Map<String, dynamic> values, String where) async {
     List<dynamic> args = [];
     var keysVal;
     values.forEach((key, value) {

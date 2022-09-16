@@ -22,12 +22,16 @@ void main() {
   test('test creation', () async {
     expect(true, await db.hasTable(t1Name));
     expect(true, await db.hasTable(t2Name));
+    expect(true, await db.hasTable(tNameWithSchema));
 
     var tableColumns = await db.getTableColumns(t1Name);
     expect(3, tableColumns.length);
     tableColumns = await db.getTableColumns(t2Name);
     expect(2, tableColumns.length);
+    tableColumns = await db.getTableColumns(tNameWithSchema);
+    expect(3, tableColumns.length);
   });
+
   test('test select', () async {
     var select =
         await db.select("select * from ${t1Name.fixedDoubleName} order by id");
@@ -36,7 +40,16 @@ void main() {
     expect(row.get('id'), 1);
     expect(row.get('name'), 'Tscherms');
     expect(row.get('temperature'), 36.0);
+
+    select = await db
+        .select("select * from ${tNameWithSchema.fixedDoubleName} order by id");
+    row = select!.first;
+
+    expect(row.get('id'), 1);
+    expect(row.get('name'), 'Tscherms');
+    expect(row.get('temperature'), 36.0);
   });
+
   test('test insert', () async {
     var sql = "INSERT INTO ${t1Name.fixedDoubleName} VALUES(4, 'Egna', 27.0);";
     await db.execute(sql);
@@ -57,6 +70,31 @@ void main() {
 
     select =
         await db.select("select * from ${t1Name.fixedDoubleName} where id=5");
+    row = select!.first;
+    expect(row.get('id'), 5);
+    expect(row.get('name'), 'Trento');
+    expect(row.get('temperature'), 18.0);
+
+    sql =
+        "INSERT INTO ${tNameWithSchema.fixedDoubleName} VALUES(4, 'Egna', 27.0);";
+    await db.execute(sql);
+
+    map = {
+      'id': 5,
+      'name': 'Trento',
+      'temperature': 18.0,
+    };
+    await db.insertMap(tNameWithSchema, map);
+
+    select = await db
+        .select("select * from ${tNameWithSchema.fixedDoubleName} where id=4");
+    row = select!.first;
+    expect(row.get('id'), 4);
+    expect(row.get('name'), 'Egna');
+    expect(row.get('temperature'), 27.0);
+
+    select = await db
+        .select("select * from ${tNameWithSchema.fixedDoubleName} where id=5");
     row = select!.first;
     expect(row.get('id'), 5);
     expect(row.get('name'), 'Trento');
@@ -116,6 +154,30 @@ void main() {
     expect(row.get('id'), 3);
     expect(row.get('name'), 'Trento');
     expect(row.get('temperature'), 18.0);
+
+    sql =
+        "UPDATE  ${tNameWithSchema.fixedDoubleName} set name='Egna', temperature=27.0 where id=3;";
+    await db.execute(sql);
+
+    select = await db
+        .select("select * from ${tNameWithSchema.fixedDoubleName} where id=3");
+    row = select!.first;
+    expect(row.get('id'), 3);
+    expect(row.get('name'), 'Egna');
+    expect(row.get('temperature'), 27.0);
+
+    map = {
+      'name': 'Trento',
+      'temperature': 18.0,
+    };
+    await db.updateMap(tNameWithSchema, map, "id=3");
+
+    select = await db
+        .select("select * from ${tNameWithSchema.fixedDoubleName} where id=3");
+    row = select!.first;
+    expect(row.get('id'), 3);
+    expect(row.get('name'), 'Trento');
+    expect(row.get('temperature'), 18.0);
   });
 
   // test('test ugly names', () async {
@@ -147,6 +209,19 @@ void main() {
   test('test pk', () async {
     var primaryKey = await db.getPrimaryKey(t1Name);
     expect('id', primaryKey);
+
+    primaryKey = await db.getPrimaryKey(tNameWithSchema);
+    expect('id', primaryKey);
+  });
+
+  test('test names with schema', () {
+    var sqlName = TableName("myschema.mytable");
+
+    expect(sqlName.getSchema(), "myschema");
+
+    sqlName = TableName("mytable");
+
+    expect(sqlName.getSchema(), "public");
   });
 
   test('test transaction', () async {
@@ -228,14 +303,20 @@ void main() {
 
 Future<void> createDbFunction(ADbAsync _db) async {
   try {
+    await _db.execute(createSchema);
     await _db.execute(dropTable1);
     await _db.execute(dropTable2);
+    await _db.execute(dropTableWithSchema);
     await _db.execute(createTable1);
     await _db.execute(createTable2);
+    await _db.execute(createTableWithSchema);
     for (var sql in insertTable1) {
       await _db.execute(sql);
     }
     for (var sql in insertTable2) {
+      await _db.execute(sql);
+    }
+    for (var sql in insertTableWithSchema) {
       await _db.execute(sql);
     }
   } on Exception catch (e, s) {
@@ -251,11 +332,15 @@ Future<void> createUglyDbFunction(ADbAsync _db) async {
   }
 }
 
-var t1Name = SqlName("table 1");
-var t2Name = SqlName("table2");
-var t3Name = SqlName("10table with,nasty");
+var t1Name = TableName("table 1");
+var t2Name = TableName("table2");
+var t3Name = TableName("10table with,nasty");
 var col1Name = SqlName("10col with,nasty");
+var tNameWithSchema = TableName("testschema.table 1");
 
+var createSchema = '''
+CREATE SCHEMA IF NOT EXISTS ${tNameWithSchema.getSchema()};
+''';
 var dropTable1 = '''
 drop table if exists ${t1Name.fixedDoubleName} cascade;
 ''';
@@ -304,6 +389,24 @@ var insertTable3 = [
   "INSERT INTO ${t3Name.fixedDoubleName} VALUES(2, 2);", //
   "INSERT INTO ${t3Name.fixedDoubleName} VALUES(3, 3);", //
 ];
+
+var createTableWithSchema = '''
+CREATE TABLE ${tNameWithSchema.fixedDoubleName} (
+  id SERIAL PRIMARY KEY, 
+  name TEXT,  
+  temperature REAL
+);
+''';
+
+var insertTableWithSchema = [
+  "INSERT INTO ${tNameWithSchema.fixedDoubleName} VALUES(1, 'Tscherms', 36.0);", //
+  "INSERT INTO ${tNameWithSchema.fixedDoubleName} VALUES(2, 'Meran', 34.0);", //
+  "INSERT INTO ${tNameWithSchema.fixedDoubleName} VALUES(3, 'Bozen', 42.0);", //
+];
+
+var dropTableWithSchema = '''
+  drop table if exists ${tNameWithSchema.fixedDoubleName} cascade;
+  ''';
 
 class Table1Obj {
   late int id;

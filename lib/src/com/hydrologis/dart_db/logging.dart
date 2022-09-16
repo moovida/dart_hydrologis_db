@@ -213,6 +213,6 @@ class LogDb {
     var item = GpLogItem()
       ..level = level.toString()
       ..message = message;
-    _db?.insertMap(SqlName(TABLE_NAME), item.toMap());
+    _db?.insertMap(TableName(TABLE_NAME), item.toMap());
   }
 }

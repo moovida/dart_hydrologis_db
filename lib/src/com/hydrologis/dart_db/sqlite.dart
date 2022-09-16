@@ -102,8 +102,14 @@ class SqliteDb extends ADb {
   }
 
   @override
-  List<SqlName> getTables({bool doOrder = false}) {
-    List<SqlName> tableNames = [];
+  List<String> getSchemas({bool doOrder = false}) {
+    /// sqlite doesn't use schemas in that sense.
+    return [];
+  }
+
+  @override
+  List<TableName> getTables({bool doOrder = false}) {
+    List<TableName> tableNames = [];
     String orderBy = " ORDER BY name";
     if (!doOrder) {
       orderBy = "";
@@ -114,13 +120,13 @@ class SqliteDb extends ADb {
     var res = select(sql);
     res.forEach((QueryResultRow row) {
       var name = row.get('name');
-      tableNames.add(SqlName(name));
+      tableNames.add(TableName(name));
     });
     return tableNames;
   }
 
   @override
-  bool hasTable(SqlName tableName) {
+  bool hasTable(TableName tableName) {
     String sql = """
       SELECT count(name) FROM sqlite_master WHERE type='table' 
       and lower(name)=lower(?)
@@ -136,7 +142,7 @@ class SqliteDb extends ADb {
   }
 
   @override
-  List<List<dynamic>> getTableColumns(SqlName tableName) {
+  List<List<dynamic>> getTableColumns(TableName tableName) {
     String sql = "PRAGMA table_info(${tableName.fixedName})";
     List<List<dynamic>> columnsList = [];
 
@@ -152,7 +158,7 @@ class SqliteDb extends ADb {
   }
 
   @override
-  String? getPrimaryKey(SqlName tableName) {
+  String? getPrimaryKey(TableName tableName) {
     String sql = "PRAGMA table_info(${tableName.fixedName})";
     var res = select(sql);
     var resultRow = res.find("pk", 1);

@@ -146,7 +146,7 @@ class PostgresqlDb extends ADbAsync {
   }
 
   @override
-  Future<int?> insertMap(SqlName table, Map<String, dynamic> values) async {
+  Future<int?> insertMap(TableName table, Map<String, dynamic> values) async {
     List<dynamic> args = [];
     var keys;
     var questions;
@@ -177,7 +177,7 @@ class PostgresqlDb extends ADbAsync {
 
   @override
   Future<int?> updateMap(
-      SqlName table, Map<String, dynamic> values, String where) async {
+      TableName table, Map<String, dynamic> values, String where) async {
     List<dynamic> args = [];
     var keysVal;
     values.forEach((key, value) {
@@ -194,15 +194,38 @@ class PostgresqlDb extends ADbAsync {
   }
 
   @override
-  Future<List<SqlName>> getTables({bool doOrder = false}) async {
-    List<SqlName> tableNames = [];
+  Future<List<SqlName>> getSchemas({bool doOrder = false}) async {
+    List<SqlName> schemaNames = [];
+    String orderBy = " ORDER BY table_schema";
+    if (!doOrder) {
+      orderBy = "";
+    }
+    String sql = """select s.nspname as table_schema
+            from pg_catalog.pg_namespace s
+            join pg_catalog.pg_user u on u.usesysid = s.nspowner
+            where nspname not in ('information_schema', 'pg_catalog', 'cron', 'topology')
+                  and nspname not like 'pg_toast%'
+                  and nspname not like 'pg_temp_%'
+            order by table_schema;  
+        $orderBy;""";
+    var res = await select(sql);
+    res?.forEach((QueryResultRow row) {
+      var schema = row.get('table_schema');
+      schemaNames.add(SqlName(schema));
+    });
+    return schemaNames;
+  }
+
+  @override
+  Future<List<TableName>> getTables({bool doOrder = false}) async {
+    List<TableName> tableNames = [];
     String orderBy = " ORDER BY table_name";
     if (!doOrder) {
       orderBy = "";
     }
-    String sql = """SELECT table_name FROM INFORMATION_SCHEMA.TABLES
+    String sql =
+        """SELECT table_schema, table_name FROM INFORMATION_SCHEMA.TABLES
         WHERE (TABLE_TYPE='BASE TABLE' or TABLE_TYPE='VIEW' or TABLE_TYPE='EXTERNAL')
-        and table_schema='public'
         and table_name != 'geography_columns'
         and table_name != 'geometry_columns'
         and table_name != 'spatial_ref_sys'
@@ -212,20 +235,26 @@ class PostgresqlDb extends ADbAsync {
     var res = await select(sql);
     res?.forEach((QueryResultRow row) {
       var name = row.get('table_name');
-      tableNames.add(SqlName(name));
+      var schema = row.get('table_schema');
+      if (schema != "public") {
+        name = schema + "." + name;
+      }
+      tableNames.add(TableName(name));
     });
     return tableNames;
   }
 
   @override
-  Future<bool> hasTable(SqlName tableName) async {
+  Future<bool> hasTable(TableName tableName) async {
+    String schema = tableName.getSchema();
+
     String sql = """SELECT count(table_name) FROM INFORMATION_SCHEMA.TABLES
                 WHERE (TABLE_TYPE='BASE TABLE' or TABLE_TYPE='VIEW' or TABLE_TYPE='EXTERNAL') 
-                and table_schema='public' 
+                and table_schema=? 
                 and upper(table_name) = upper(?)
                 """;
 
-    var res = await select(sql, [tableName.name]);
+    var res = await select(sql, [schema, tableName.name]);
     if (res != null && res.length == 1) {
       var row = res.first;
       var count = row.getAt(0);
@@ -235,17 +264,17 @@ class PostgresqlDb extends ADbAsync {
   }
 
   @override
-  Future<List<List>> getTableColumns(SqlName tableName) async {
+  Future<List<List>> getTableColumns(TableName tableName) async {
     var pkName = await getPrimaryKey(tableName);
 
     String sql = """select column_name, data_type 
                     from information_schema.columns 
                     where upper(table_name)=upper(?) 
-                    and table_Schema!='information_schema'""";
+                    and table_Schema=?""";
 
     List<List<dynamic>> columnsList = [];
 
-    var res = await select(sql, [tableName.name]);
+    var res = await select(sql, [tableName.name, tableName.getSchema()]);
     res?.forEach((QueryResultRow row) {
       String colName = row.get('column_name');
       String colType = row.get('data_type');
@@ -261,7 +290,7 @@ class PostgresqlDb extends ADbAsync {
   }
 
   @override
-  Future<String?> getPrimaryKey(SqlName tableName) async {
+  Future<String?> getPrimaryKey(TableName tableName) async {
     var queryResult = await select(getIndexSql(tableName));
     if (queryResult?.length == 0) {
       return null;
@@ -276,7 +305,7 @@ class PostgresqlDb extends ADbAsync {
     return pkName;
   }
 
-  String getIndexSql(SqlName tableName) {
+  String getIndexSql(TableName tableName) {
     return "SELECT  tnsp.nspname AS schema_name,   trel.relname AS table_name,   irel.relname AS index_name,   " + //
         " a.attname    || ' ' || CASE o.option & 1 WHEN 1 THEN 'DESC' ELSE 'ASC' END   || ' ' || CASE  " + //
         " o.option & 2 WHEN 2 THEN 'NULLS FIRST' ELSE 'NULLS LAST' END   AS column, " + //
@@ -291,6 +320,9 @@ class PostgresqlDb extends ADbAsync {
         "  where pi.indexname=irel.relname " + //
         "  and upper(trel.relname)=upper('" +
         tableName.name +
+        "') " +
+        "  and upper(tnsp.nspname)=upper('" +
+        tableName.getSchema() +
         "')";
   }
 
