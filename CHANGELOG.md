@@ -1,3 +1,8 @@
+## 1.0.0
+
+- added support for schemas (postgres)
+- breaking changes on SqlName
+
 ## 0.7.4
 
 - postgres libs upgrade
