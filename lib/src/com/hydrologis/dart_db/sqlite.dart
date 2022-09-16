@@ -120,7 +120,7 @@ class SqliteDb extends ADb {
     var res = select(sql);
     res.forEach((QueryResultRow row) {
       var name = row.get('name');
-      tableNames.add(TableName(name));
+      tableNames.add(TableName(name, schemaSupported: false));
     });
     return tableNames;
   }
