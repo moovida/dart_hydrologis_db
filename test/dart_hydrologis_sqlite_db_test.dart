@@ -10,6 +10,7 @@ ADb createDb(Function onCreateFunction) {
 var t1Name = TableName("table 1", schemaSupported: false);
 var t2Name = TableName("table2", schemaSupported: false);
 var t3Name = TableName("10table with,nasty", schemaSupported: false);
+var t4Name = TableName("大衡ポリゴン", schemaSupported: false);
 var col1Name = SqlName("10col with,nasty");
 
 var createTable1 = '''
@@ -50,6 +51,13 @@ var insertTable3 = [
   "INSERT INTO ${t3Name.fixedName} VALUES(2, 2);", //
   "INSERT INTO ${t3Name.fixedName} VALUES(3, 3);", //
 ];
+
+var createTable4 = '''
+  CREATE TABLE ${t4Name.fixedName} (  
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    ${col1Name.fixedName} INTEGER
+  );
+  ''';
 
 class Table1Obj {
   late int id;
@@ -167,6 +175,7 @@ void main() {
     var db = createDb(createUglyDbFunction);
 
     expect(true, db.hasTable(t3Name));
+    expect(true, db.hasTable(t4Name));
 
     var tableColumns = db.getTableColumns(t3Name);
     expect(2, tableColumns.length);
@@ -185,6 +194,15 @@ void main() {
         "select ${col1Name.bracketName} from ${t3Name.fixedName} where id=1");
     row = select.first;
     expect(row.get(col1Name.name), 1000);
+
+    var sql = "PRAGMA table_info(${t4Name.fixedDoubleName})";
+    select = db.select(sql);
+    expect(2, select.length);
+
+    var pk = db.getPrimaryKey(t4Name);
+    expect(pk, "id");
+    pk = db.getPrimaryKey(t3Name);
+    expect(pk, "id");
 
     db.close();
   });
@@ -410,4 +428,5 @@ void createUglyDbFunction(SqliteDb _db) {
   insertTable3.forEach((sql) {
     _db.execute(sql);
   });
+  _db.execute(createTable4);
 }

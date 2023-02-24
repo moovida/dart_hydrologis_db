@@ -1,3 +1,7 @@
+## 1.0.0+1
+
+- fix on sqlite primary key retrival
+
 ## 1.0.0
 
 - added support for schemas (postgres)

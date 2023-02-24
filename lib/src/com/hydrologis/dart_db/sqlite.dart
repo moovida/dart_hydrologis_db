@@ -159,7 +159,7 @@ class SqliteDb extends ADb {
 
   @override
   String? getPrimaryKey(TableName tableName) {
-    String sql = "PRAGMA table_info(${tableName.fixedName})";
+    String sql = "PRAGMA table_info(${tableName.fixedDoubleName})";
     var res = select(sql);
     var resultRow = res.find("pk", 1);
     if (resultRow != null) {

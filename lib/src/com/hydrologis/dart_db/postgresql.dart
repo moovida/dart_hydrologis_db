@@ -119,8 +119,8 @@ class PostgresqlDb extends ADbAsync {
       }
     } on Exception catch (e, s) {
       SLogger().e("Execute error.", e, s);
+      rethrow;
     }
-    return null;
   }
 
   @override
@@ -140,9 +140,9 @@ class PostgresqlDb extends ADbAsync {
       var sqlResult = await _db?.query(sql, substitutionValues: paramsMap);
       return QueryResult.fromPostgresqlResult(sqlResult);
     } on Exception catch (ex, s) {
-      SLogger().e("Execute error.", ex, s);
+      SLogger().e("Select error.", ex, s);
+      rethrow;
     }
-    return null;
   }
 
   @override
