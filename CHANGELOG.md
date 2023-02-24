@@ -1,9 +1,9 @@
-## 1.0.0+1
+## 1.0.1
 
 - better support for asian table names
 - fixes in postgres error rethrowing
 
-## 1.0.1
+## 1.0.0+1
 
 - fix on sqlite primary key retrival
 
