@@ -225,6 +225,14 @@ class TableName {
     }
   }
 
+  String getFullName() {
+    String fullName = name;
+    if (hasSchema()) {
+      fullName = _schema! + "." + name;
+    }
+    return fullName;
+  }
+
   bool hasSchema() {
     return _schema != null;
   }

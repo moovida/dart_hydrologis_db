@@ -293,19 +293,39 @@ class PostgresqlDb extends ADbAsync {
   Future<String?> getPrimaryKey(TableName tableName) async {
     var queryResult = await select(getIndexSql(tableName));
     if (queryResult?.length == 0) {
+      // try second way
+      var queryResult = await select(getIndexSql(tableName));
+      if (queryResult?.length == 0) {
+        return null;
+      } else {
+        var queryResultRow = queryResult?.first;
+        String? pkName;
+        String? indexName = queryResultRow?.get("index_name").toString();
+        if (indexName != null && indexName.toLowerCase().contains("pkey")) {
+          String? columnDef = queryResultRow?.get("column").toString();
+          pkName = columnDef?.split(RegExp(r"\s+"))[0];
+        }
+        return pkName;
+      }
+    } else {
+      var row = queryResult?.first;
+      if (row != null) {
+        return row.getAt(0);
+      }
       return null;
     }
-    var queryResultRow = queryResult?.first;
-    String? pkName;
-    String? indexName = queryResultRow?.get("index_name").toString();
-    if (indexName != null && indexName.toLowerCase().contains("pkey")) {
-      String? columnDef = queryResultRow?.get("column").toString();
-      pkName = columnDef?.split(RegExp(r"\s+"))[0];
-    }
-    return pkName;
   }
 
   String getIndexSql(TableName tableName) {
+    return """SELECT a.attname
+              FROM   pg_index i
+              JOIN   pg_attribute a ON a.attrelid = i.indrelid
+                                  AND a.attnum = ANY(i.indkey)
+              WHERE  i.indrelid = '${tableName.fixedDoubleName}'::regclass
+              AND    i.indisprimary;""";
+  }
+
+  String getIndexSql2(TableName tableName) {
     return "SELECT  tnsp.nspname AS schema_name,   trel.relname AS table_name,   irel.relname AS index_name,   " + //
         " a.attname    || ' ' || CASE o.option & 1 WHEN 1 THEN 'DESC' ELSE 'ASC' END   || ' ' || CASE  " + //
         " o.option & 2 WHEN 2 THEN 'NULLS FIRST' ELSE 'NULLS LAST' END   AS column, " + //
