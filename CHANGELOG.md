@@ -1,3 +1,7 @@
+## 1.1.0
+
+- Moved to abstract queryresult api. 
+
 ## 1.0.1
 
 - better support for asian table names
