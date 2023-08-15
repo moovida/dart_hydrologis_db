@@ -326,22 +326,22 @@ class PostgresqlDb extends ADbAsync {
   }
 
   String getIndexSql2(TableName tableName) {
-    return "SELECT  tnsp.nspname AS schema_name,   trel.relname AS table_name,   irel.relname AS index_name,   " + //
-        " a.attname    || ' ' || CASE o.option & 1 WHEN 1 THEN 'DESC' ELSE 'ASC' END   || ' ' || CASE  " + //
-        " o.option & 2 WHEN 2 THEN 'NULLS FIRST' ELSE 'NULLS LAST' END   AS column, " + //
-        " pi.indexdef " + //
-        " FROM pg_index AS i JOIN pg_class AS trel ON trel.oid = i.indrelid JOIN pg_namespace AS tnsp  " + //
-        " ON trel.relnamespace = tnsp.oid JOIN pg_class AS irel ON irel.oid = i.indexrelid CROSS JOIN LATERAL " + //
-        "  unnest (i.indkey) WITH ORDINALITY AS c (colnum, ordinality) LEFT JOIN LATERAL unnest (i.indoption)  " + //
-        "  WITH ORDINALITY AS o (option, ordinality)   ON c.ordinality = o.ordinality JOIN  " + //
-        "  pg_attribute AS a ON trel.oid = a.attrelid AND  " + //
-        "  a.attnum = c.colnum , " + //
-        "  pg_indexes pi " + //
-        "  where pi.indexname=irel.relname " + //
-        "  and upper(trel.relname)=upper('" +
+    return "SELECT  tnsp.nspname AS schema_name,   trel.relname AS table_name,   irel.relname AS index_name,   " //
+            " a.attname    || ' ' || CASE o.option & 1 WHEN 1 THEN 'DESC' ELSE 'ASC' END   || ' ' || CASE  " //
+            " o.option & 2 WHEN 2 THEN 'NULLS FIRST' ELSE 'NULLS LAST' END   AS column, " //
+            " pi.indexdef " //
+            " FROM pg_index AS i JOIN pg_class AS trel ON trel.oid = i.indrelid JOIN pg_namespace AS tnsp  " //
+            " ON trel.relnamespace = tnsp.oid JOIN pg_class AS irel ON irel.oid = i.indexrelid CROSS JOIN LATERAL " //
+            "  unnest (i.indkey) WITH ORDINALITY AS c (colnum, ordinality) LEFT JOIN LATERAL unnest (i.indoption)  " //
+            "  WITH ORDINALITY AS o (option, ordinality)   ON c.ordinality = o.ordinality JOIN  " //
+            "  pg_attribute AS a ON trel.oid = a.attrelid AND  " //
+            "  a.attnum = c.colnum , " //
+            "  pg_indexes pi " //
+            "  where pi.indexname=irel.relname " //
+            "  and upper(trel.relname)=upper('" +
         tableName.name +
-        "') " +
-        "  and upper(tnsp.nspname)=upper('" +
+        "') "
+            "  and upper(tnsp.nspname)=upper('" +
         tableName.getSchema() +
         "')";
   }
