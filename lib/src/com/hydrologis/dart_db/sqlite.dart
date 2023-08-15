@@ -94,7 +94,7 @@ class SqliteDb extends ADb {
         args.add(element);
       });
       final ResultSet? result = selectStmt?.select(args);
-      return QueryResult.fromResultSet(result);
+      return SqliteQueryResult.fromResultSet(result);
     } finally {
       selectStmt?.dispose();
       // selectStmt?.close();
@@ -197,5 +197,91 @@ class SqliteDb extends ADb {
       directOnly: directOnly,
       function: function,
     );
+  }
+}
+
+class SqliteQueryResult implements QueryResult {
+  ResultSet? sqliteResultSet;
+  PostgreSQLResult? postgreSQLResult;
+
+  SqliteQueryResult.fromResultSet(this.sqliteResultSet);
+
+  @override
+  int get length {
+    if (sqliteResultSet != null) {
+      return sqliteResultSet!.length;
+    } else if (postgreSQLResult != null) {
+      return postgreSQLResult!.length;
+    }
+    throw StateError("No query result defined.");
+  }
+
+  @override
+  QueryResultRow get first {
+    if (sqliteResultSet != null) {
+      return SqliteQueryResultRow.fromSqliteResultSetRow(
+          sqliteResultSet!.first);
+    }
+    throw StateError("No query result defined.");
+  }
+
+  /// Run a function taking a [QueryResultRow] on the whole [QueryResult].
+  @override
+  void forEach(Function rowFunction) {
+    if (sqliteResultSet != null) {
+      sqliteResultSet!.forEach((row) {
+        rowFunction(SqliteQueryResultRow.fromSqliteResultSetRow(row));
+      });
+      return;
+    }
+    throw StateError("No query result defined.");
+  }
+
+  /// Find the [QueryResultRow] given a field and value.
+  @override
+  QueryResultRow? find(String field, dynamic value) {
+    if (sqliteResultSet != null) {
+      for (var map in sqliteResultSet!) {
+        var checkValue = map[field];
+        if (checkValue == value) {
+          return SqliteQueryResultRow.fromSqliteResultSetRow(map);
+        }
+      }
+      return null;
+    }
+    throw StateError("No query result defined.");
+  }
+}
+
+class SqliteQueryResultRow implements QueryResultRow {
+  Row? sqliteResultSetRow;
+
+  SqliteQueryResultRow.fromSqliteResultSetRow(this.sqliteResultSetRow);
+
+  @override
+  dynamic get(String filedName) {
+    if (sqliteResultSetRow != null) {
+      return sqliteResultSetRow![filedName];
+    }
+    throw StateError("No query result defined.");
+  }
+
+  @override
+  dynamic getAt(int index) {
+    if (sqliteResultSetRow != null) {
+      return sqliteResultSetRow!.columnAt(index);
+    }
+    throw StateError("No query result defined.");
+  }
+
+  /// Run a function taking a a key and its value on the whole [QueryResultRow].
+  @override
+  void forEach(Function keyValueFunction) {
+    if (sqliteResultSetRow == null) {
+      throw StateError("No query result defined.");
+    }
+    sqliteResultSetRow!.forEach((key, value) {
+      keyValueFunction(key, value);
+    });
   }
 }

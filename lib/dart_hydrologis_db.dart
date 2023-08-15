@@ -8,6 +8,7 @@ import 'package:postgres/postgres.dart';
 import 'package:sqlite3/sqlite3.dart' if (dart.library.html) 'web_stubs.dart';
 import 'package:path/path.dart';
 import 'package:stack_trace/stack_trace.dart';
+import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
 
 part 'src/com/hydrologis/dart_db/sqlite.dart';
 part 'src/com/hydrologis/dart_db/postgresql.dart';

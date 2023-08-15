@@ -138,7 +138,7 @@ class PostgresqlDb extends ADbAsync {
     }
     try {
       var sqlResult = await _db?.query(sql, substitutionValues: paramsMap);
-      return QueryResult.fromPostgresqlResult(sqlResult);
+      return PGQueryResult.fromPostgresqlResult(sqlResult);
     } on Exception catch (ex, s) {
       SLogger().e("Select error.", ex, s);
       rethrow;
@@ -350,5 +350,90 @@ class PostgresqlDb extends ADbAsync {
   Future<dynamic>? transaction(Function transactionOperations) async {
     return await _db?.transaction(transactionOperations as Future Function(
         PostgreSQLExecutionContext connection));
+  }
+}
+
+class PGQueryResult implements QueryResult {
+  PostgreSQLResult? postgreSQLResult;
+
+  PGQueryResult.fromPostgresqlResult(this.postgreSQLResult);
+
+  @override
+  int get length {
+    if (postgreSQLResult != null) {
+      return postgreSQLResult!.length;
+    }
+    throw StateError("No query result defined.");
+  }
+
+  @override
+  QueryResultRow get first {
+    if (postgreSQLResult != null) {
+      return PGQueryResultRow.fromPostgresqlResultSetRow(
+          postgreSQLResult!.first);
+    }
+    throw StateError("No query result defined.");
+  }
+
+  /// Run a function taking a [QueryResultRow] on the whole [QueryResult].
+  @override
+  void forEach(Function rowFunction) {
+    if (postgreSQLResult != null) {
+      postgreSQLResult!.forEach((row) {
+        rowFunction(PGQueryResultRow.fromPostgresqlResultSetRow(row));
+      });
+      return;
+    }
+    throw StateError("No query result defined.");
+  }
+
+  /// Find the [QueryResultRow] given a field and value.
+  @override
+  QueryResultRow? find(String field, dynamic value) {
+    if (postgreSQLResult != null) {
+      for (var map in postgreSQLResult!) {
+        var columnMap = map.toColumnMap();
+        var checkValue = columnMap[field];
+        if (checkValue == value) {
+          return PGQueryResultRow.fromPostgresqlResultSetRow(map);
+        }
+      }
+      return null;
+    }
+    throw StateError("No query result defined.");
+  }
+}
+
+class PGQueryResultRow implements QueryResultRow {
+  PostgreSQLResultRow? postgreSQLResultRow;
+
+  PGQueryResultRow.fromPostgresqlResultSetRow(this.postgreSQLResultRow);
+
+  @override
+  dynamic get(String filedName) {
+    if (postgreSQLResultRow != null) {
+      return postgreSQLResultRow!.toColumnMap()[filedName];
+    }
+    throw StateError("No query result defined.");
+  }
+
+  @override
+  dynamic getAt(int index) {
+    if (postgreSQLResultRow != null) {
+      return postgreSQLResultRow![index];
+    }
+    throw StateError("No query result defined.");
+  }
+
+  /// Run a function taking a a key and its value on the whole [QueryResultRow].
+  @override
+  void forEach(Function keyValueFunction) {
+    if (postgreSQLResultRow != null) {
+      postgreSQLResultRow!.toColumnMap().forEach((key, value) {
+        keyValueFunction(key, value);
+      });
+      return;
+    }
+    throw StateError("No query result defined.");
   }
 }

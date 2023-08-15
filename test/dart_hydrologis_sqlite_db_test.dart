@@ -1,4 +1,5 @@
 import 'package:dart_hydrologis_db/dart_hydrologis_db.dart';
+import 'package:dart_hydrologis_utils/dart_hydrologis_utils.dart';
 import 'package:test/test.dart';
 
 ADb createDb(Function onCreateFunction) {
