@@ -1,6 +1,6 @@
 name: dart_hydrologis_db
 description: Dart based db utilities.
-version: 1.1.0+1
+version: 1.1.0+2
 repository: https://github.com/moovida/dart_hydrologis_db
 issue_tracker: https://github.com/moovida/dart_hydrologis_db/issues
 

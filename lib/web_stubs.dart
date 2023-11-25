@@ -20,9 +20,6 @@ class PreparedStatement {
 }
 
 class ResultSet implements Iterable<dynamic> {
-  late int length;
-  late dynamic first;
-
   @override
   bool any(bool Function(dynamic element) test) {
     throw UnimplementedError();
@@ -39,7 +36,7 @@ class ResultSet implements Iterable<dynamic> {
   }
 
   @override
-  elementAt(int index) {
+  dynamic elementAt(int index) {
     throw UnimplementedError();
   }
 
@@ -54,7 +51,8 @@ class ResultSet implements Iterable<dynamic> {
   }
 
   @override
-  firstWhere(bool Function(dynamic element) test, {Function()? orElse}) {
+  dynamic firstWhere(bool Function(dynamic element) test,
+      {Function()? orElse}) {
     throw UnimplementedError();
   }
 
@@ -87,10 +85,10 @@ class ResultSet implements Iterable<dynamic> {
   }
 
   @override
-  get last => throw UnimplementedError();
+  dynamic get last => throw UnimplementedError();
 
   @override
-  lastWhere(bool Function(dynamic element) test, {Function()? orElse}) {
+  dynamic lastWhere(bool Function(dynamic element) test, {Function()? orElse}) {
     throw UnimplementedError();
   }
 
@@ -100,15 +98,16 @@ class ResultSet implements Iterable<dynamic> {
   }
 
   @override
-  reduce(Function(dynamic value, dynamic element) combine) {
+  dynamic reduce(Function(dynamic value, dynamic element) combine) {
     throw UnimplementedError();
   }
 
   @override
-  get single => throw UnimplementedError();
+  dynamic get single => throw UnimplementedError();
 
   @override
-  singleWhere(bool Function(dynamic element) test, {Function()? orElse}) {
+  dynamic singleWhere(bool Function(dynamic element) test,
+      {Function()? orElse}) {
     throw UnimplementedError();
   }
 
@@ -151,9 +150,15 @@ class ResultSet implements Iterable<dynamic> {
   Iterable<T> whereType<T>() {
     throw UnimplementedError();
   }
+
+  @override
+  dynamic get first => throw UnimplementedError();
+
+  @override
+  int get length => throw UnimplementedError();
 }
 
-class ScalarFunction {}
+typedef ScalarFunction = Object? Function(List<Object?> arguments);
 
 class AllowedArgumentCount {
   AllowedArgumentCount(int arg);
@@ -165,7 +170,7 @@ class Row implements Map<String, dynamic> {
   }
 
   @override
-  operator [](Object? key) {
+  dynamic operator [](Object? key) {
     throw UnimplementedError();
   }
 
@@ -221,12 +226,12 @@ class Row implements Map<String, dynamic> {
   }
 
   @override
-  putIfAbsent(String key, Function() ifAbsent) {
+  dynamic putIfAbsent(String key, Function() ifAbsent) {
     throw UnimplementedError();
   }
 
   @override
-  remove(Object? key) {
+  dynamic remove(Object? key) {
     throw UnimplementedError();
   }
 
@@ -234,7 +239,8 @@ class Row implements Map<String, dynamic> {
   void removeWhere(bool Function(String key, dynamic value) test) {}
 
   @override
-  update(String key, Function(dynamic value) update, {Function()? ifAbsent}) {
+  dynamic update(String key, Function(dynamic value) update,
+      {Function()? ifAbsent}) {
     throw UnimplementedError();
   }
 
