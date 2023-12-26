@@ -31,6 +31,7 @@ class SqliteDb extends ADb {
       _db = sqlite3.open(_dbPath!);
       // _db = Database.openFile(dbFile);
     }
+    _isClosed = false;
     if (!existsAlready && populateFunction != null) {
       // db is open already, we can use the wrapper for the create function.
       populateFunction(this);

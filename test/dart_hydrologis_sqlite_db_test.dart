@@ -105,6 +105,21 @@ void main() {
 
     db.close();
   });
+
+  test('test creation with closed', () {
+    var db = createDb(createDbFunction);
+    db.close();
+
+    expect(true, db.hasTable(t1Name));
+    expect(true, db.hasTable(t2Name));
+
+    var tableColumns = db.getTableColumns(t1Name);
+    expect(3, tableColumns.length);
+    tableColumns = db.getTableColumns(t2Name);
+    expect(2, tableColumns.length);
+
+    db.close();
+  });
   test('test select', () {
     var db = createDb(createDbFunction);
 

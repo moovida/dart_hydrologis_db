@@ -1,3 +1,7 @@
+## 1.1.1
+
+- added automatic reopen of db.
+
 ## 1.1.0
 
 - Moved to abstract queryresult api. 
