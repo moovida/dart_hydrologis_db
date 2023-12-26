@@ -4,6 +4,7 @@ part of dart_hydrologis_db;
 class SqliteDb extends ADb {
   Database? _db;
   String? _dbPath;
+  Function? _populateFunction;
   bool _isClosed = false;
 
   SqliteDb(this._dbPath);
@@ -18,6 +19,7 @@ class SqliteDb extends ADb {
 
   @override
   void open({Function? populateFunction}) {
+    _populateFunction = populateFunction;
     bool existsAlready;
     if (_dbPath == null) {
       _db = sqlite3.openInMemory();
@@ -32,6 +34,13 @@ class SqliteDb extends ADb {
     if (!existsAlready && populateFunction != null) {
       // db is open already, we can use the wrapper for the create function.
       populateFunction(this);
+    }
+  }
+
+  void checkOpen() {
+    if (_db == null || _isClosed) {
+      // reopen it
+      open(populateFunction: _populateFunction);
     }
   }
 
@@ -62,6 +71,7 @@ class SqliteDb extends ADb {
       {List<dynamic>? arguments,
       bool getLastInsertId = false,
       String? primaryKey}) {
+    checkOpen();
     PreparedStatement? stmt;
     try {
       stmt = _db?.prepare(sqlToExecute);
@@ -86,6 +96,7 @@ class SqliteDb extends ADb {
 
   @override
   QueryResult select(String sql, [List<dynamic>? arguments]) {
+    checkOpen();
     PreparedStatement? selectStmt;
     try {
       selectStmt = _db?.prepare(sql);
@@ -109,6 +120,7 @@ class SqliteDb extends ADb {
 
   @override
   List<TableName> getTables({bool doOrder = false}) {
+    checkOpen();
     List<TableName> tableNames = [];
     String orderBy = " ORDER BY name";
     if (!doOrder) {
@@ -127,6 +139,7 @@ class SqliteDb extends ADb {
 
   @override
   bool hasTable(TableName tableName) {
+    checkOpen();
     String sql = """
       SELECT count(name) FROM sqlite_master WHERE type='table' 
       and lower(name)=lower(?)
@@ -143,6 +156,7 @@ class SqliteDb extends ADb {
 
   @override
   List<List<dynamic>> getTableColumns(TableName tableName) {
+    checkOpen();
     String sql = "PRAGMA table_info(${tableName.fixedName})";
     List<List<dynamic>> columnsList = [];
 
@@ -159,6 +173,7 @@ class SqliteDb extends ADb {
 
   @override
   String? getPrimaryKey(TableName tableName) {
+    checkOpen();
     String sql = "PRAGMA table_info(${tableName.fixedDoubleName})";
     var res = select(sql);
     var resultRow = res.find("pk", 1);
@@ -190,6 +205,7 @@ class SqliteDb extends ADb {
     bool deterministic = false,
     bool directOnly = true,
   }) {
+    checkOpen();
     _db?.createFunction(
       functionName: functionName,
       argumentCount: AllowedArgumentCount(argumentCount),
